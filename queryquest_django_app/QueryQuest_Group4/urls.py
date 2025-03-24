@@ -15,10 +15,16 @@ Including another URLconf
     2. Add a URL to urlpatterns:  path('blog/', include('blog.urls'))
 """
 from django.contrib import admin
-from django.urls import path
-from testapp import views
+from django.urls import path, include
+from submissions import views
 
 urlpatterns = [
     # path('admin/', admin.site.urls),
-    path('', views.testmysql)
+    
+    # Path to get incorrect submissions for a specific student
+    path('submissions/incorrect/<str:student_id>/', views.incorrect_submissions, name='incorrect_submissions'),
+    
+    # Path to get all submissions for a specific problem
+    path('submissions/problem/<int:problem_id>/', views.problem_submissions, name='problem_submissions'),
+    
 ]

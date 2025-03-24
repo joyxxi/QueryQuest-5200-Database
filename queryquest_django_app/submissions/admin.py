@@ -1,3 +1,5 @@
 from django.contrib import admin
+from .models import Submission
 
-# Register your models here.
+# 注册 Submission 模型
+admin.site.register(Submission)

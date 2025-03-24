@@ -38,7 +38,7 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
-    'testapp',
+    'submissions',
 ]
 
 MIDDLEWARE = [
@@ -86,8 +86,8 @@ if os.getenv('GAE_APPLICATION', None):
         'default': {
             'ENGINE': 'django.db.backends.mysql', 
             'HOST': '/cloudsql/db-group4-451519:us-west1:neu-5200-group4', 
-            'USER': 'zhixi',
-            'PASSWORD': 'zhixi123!',
+            'USER': 'yihan',
+            'PASSWORD': 'yihan123!',
             'NAME': 'test',
         }
     }
@@ -96,8 +96,8 @@ else:
         'default': {
             'ENGINE': 'django.db.backends.mysql',
             'NAME': 'test',
-            'USER': 'zhixi',
-            'PASSWORD': 'zhixi123!',
+            'USER': 'yihan',
+            'PASSWORD': 'yihan123!',
             'HOST': '35.247.120.164',
             'PORT': '3306'
         }
