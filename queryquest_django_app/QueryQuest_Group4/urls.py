@@ -26,8 +26,5 @@ urlpatterns = [
     
     # Path to get all submissions for a specific problem
     path('submissions/problem/<int:problem_id>/', views.problem_submissions, name='problem_submissions'),
-
-    # Path to problems app
-    path('problems/', include('problems.urls')),
     
 ]
