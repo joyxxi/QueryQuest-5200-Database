@@ -3,21 +3,16 @@ from django.views.decorators.http import require_GET
 from rest_framework.decorators import api_view
 from rest_framework.response import Response
 from rest_framework import status
-from .models import User, Message
+from .models import User, Student, Instructor, Admin, Message
 from .serializers import UserSerializer, MessageSerializer
 from django.contrib.auth.hashers import check_password
-
-@require_GET
-def hello_world(request):
-    return JsonResponse({"message": "Hello, World!"})
 
 @api_view(['POST'])
 def signup(request):
     serializer = UserSerializer(data=request.data)
     
     if serializer.is_valid():
-        # In production, you should hash the password here
-        # For now we'll store it as plaintext (not recommended for production)
+        # Create the base user first
         user = User.objects.create(
             role=serializer.validated_data['role'],
             username=serializer.validated_data['username'],
@@ -25,7 +20,23 @@ def signup(request):
             password=serializer.validated_data['password']
         )
         
-        return Response({"status": "success", "user_id": user.user_id}, status=status.HTTP_201_CREATED)
+        # Create role-specific profile
+        if user.role == 'student':
+            Student.objects.create(
+                student_id=user,
+                current_level=0,
+                total_points=0
+            )
+        elif user.role == 'instructor':
+            Instructor.objects.create(
+                instructor_id=user
+            )
+        elif user.role == 'admin':
+            Admin.objects.create(
+                admin_id=user
+            )
+
+        return Response({"status": "success", "user_id": user.user_id, "role": user.role}, status=status.HTTP_201_CREATED)
     
     return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
