@@ -5,3 +5,9 @@
 .env
 venv/
 .dbenv/
+queryquest_django_app/problems/__pycache__
+queryquest_django_app/QueryQuest_Group4/__pycache__
+queryquest_django_app/submissions/__pycache__
+queryquest_django_app/submissions/migrations/__pycache__
+queryquest_django_app/users/__pycache__
+queryquest_django_app/users/migrations/__pycache__
