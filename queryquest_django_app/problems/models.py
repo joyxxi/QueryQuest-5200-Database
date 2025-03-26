@@ -1,14 +1,12 @@
 from django.db import models
-from django.contrib.auth import get_user_model
-
-User = get_user_model()  # This will use your custom user model if you have one.
+from users.models import User
 
 class Module(models.Model):
     module_id = models.IntegerField(primary_key=True)
     module_title = models.CharField(max_length=100)
 
     def __str__(self):
-        return self.module_title
+        return str(self.module_id)
 
     class Meta:
         db_table = 'Modules'
@@ -19,7 +17,7 @@ class Unit(models.Model):
     unit_title = models.CharField(max_length=100)
 
     def __str__(self):
-        return self.unit_title
+        return str(self.unit_id)
 
     class Meta:
         db_table = 'Units'
@@ -49,7 +47,7 @@ class Problem(models.Model):
     choice3 = models.CharField(max_length=100, blank=True, null=True)  # Optional
     
     correct_answer = models.PositiveSmallIntegerField()  # index of correct choice (1/2/3)
-    created_by = models.ForeignKey(User, null=True, blank=True, on_delete=models.SET_NULL)
+    created_by = models.ForeignKey(User, null=True, blank=True, on_delete=models.SET_NULL, db_column='created_by')
     created_at = models.DateTimeField(auto_now_add=True)
     
     def __str__(self):
