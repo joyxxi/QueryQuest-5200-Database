@@ -23,7 +23,8 @@ class Student(models.Model):
         User, 
         on_delete=models.CASCADE,
         primary_key=True,
-        related_name='student_profile'
+        related_name='student_profile',
+        db_column='student_id'  # Explicitly set the column name
     )
     current_level = models.IntegerField(default=0)
     total_points = models.IntegerField(default=0)
@@ -36,10 +37,9 @@ class Instructor(models.Model):
         User,
         on_delete=models.CASCADE,
         primary_key=True,
-        related_name='instructor_profile'
+        related_name='instructor_profile',
+        db_column='instructor_id'  # Explicitly set the column name
     )
-    # Add any instructor-specific fields here
-    department = models.CharField(max_length=100, blank=True)
 
     class Meta:
         db_table = 'Instructors'
@@ -49,10 +49,9 @@ class Admin(models.Model):
         User,
         on_delete=models.CASCADE,
         primary_key=True,
-        related_name='admin_profile'
+        related_name='admin_profile',
+        db_column='admin_id'  # Explicitly set the column name
     )
-    # Add any admin-specific fields here
-    access_level = models.IntegerField(default=1)
 
     class Meta:
         db_table = 'Admins'
