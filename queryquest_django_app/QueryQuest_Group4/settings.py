@@ -45,6 +45,7 @@ INSTALLED_APPS = [
     # Apps
     'submissions',
     'problems',
+    'users',
 ]
 
 MIDDLEWARE = [

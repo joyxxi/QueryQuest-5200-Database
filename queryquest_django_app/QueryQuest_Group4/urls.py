@@ -17,10 +17,14 @@ Including another URLconf
 from django.contrib import admin
 from django.urls import path, include
 from submissions import views
+from users.views import signup, login, send_message # Import the new view
 
 urlpatterns = [
     # path('admin/', admin.site.urls),
-    
+    path('api/signup/', signup, name='signup'),  
+    path('api/login/', login, name='login'), 
+    path('api/send_message/', send_message, name='send-message'),
+
     # Path to get incorrect submissions for a specific student
     path('submissions/incorrect/<str:student_id>/', views.incorrect_submissions, name='incorrect_submissions'),
     
