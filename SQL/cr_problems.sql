@@ -16,7 +16,7 @@ CREATE TABLE Units (
     unit_id INT PRIMARY KEY,
     module_id INT,
     unit_title VARCHAR(100),
-    FOREIGN KEY (module_id) REFERENCES Modules(module_id)
+    FOREIGN KEY (module_id) REFERENCES Modules(module_id) ON DELETE CASCADE
 );
 
 INSERT INTO Units (unit_id, module_id, unit_title) VALUES
@@ -51,7 +51,7 @@ CREATE TABLE Problems (
     correct_answer TINYINT NOT NULL, -- index of correct choice (1/2/3)
     created_by CHAR(36),
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    FOREIGN KEY (unit_id) REFERENCES Units(unit_id),
+    FOREIGN KEY (unit_id) REFERENCES Units(unit_id) ON DELETE CASCADE,
     FOREIGN KEY (created_by) REFERENCES Users(user_id) ON DELETE SET NULL
 );
 
