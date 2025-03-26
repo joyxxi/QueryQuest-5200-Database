@@ -47,6 +47,7 @@ INSTALLED_APPS = [
     'submissions',
     'problems',
     'users',
+    'progress'
     'feedback',
 ]
 

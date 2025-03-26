@@ -33,5 +33,9 @@ urlpatterns = [
 
     # Path to problems app
     path('problems/', include('problems.urls')),
+
+    # Include the progress app URLs
+    path('progress/', include('progress.urls')),  
+
     
 ]
