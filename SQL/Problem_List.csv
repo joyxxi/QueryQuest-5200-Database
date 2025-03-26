@@ -1,0 +1,29 @@
+module_id,unit_id,description,problem_type,difficulty,choice1,choice2,choice3,correct_answer
+1,1,SQL is case-sensitive for keywords like SELECT and FROM.,True-False,Easy,True,False,,2
+1,1,Which of the following is a valid SQL keyword?,Multi-Select,Easy,SELECT,WHERE,PRINT,1
+1,2,The WHERE clause comes after the ORDER BY clause.,True-False,Easy,True,False,,2
+1,2,Which clause is required in every SELECT statement?,Multi-Select,Medium,FROM,WHERE,INSERT,1
+1,3,You can use LIMIT to restrict the number of results shown.,True-False,Easy,True,False,,1
+1,3,What clause is used to sort query results?,Multi-Select,Medium,ORDER BY,SORT,ARRANGE,1
+1,4,The LIKE operator supports wildcards like % for partial matching.,True-False,Easy,True,False,,1
+1,4,What operator is used to check if a value is within a set of values?,Multi-Select,Medium,BETWEEN,IN,EQUALS,2
+1,5,Which of the following is an aggregate function?,Multi-Select,Easy,COUNT(),SUM(),LOWER(),1
+1,5,GROUP BY can be used without aggregate functions.,True-False,Medium,True,False,,2
+1,6,"HAVING filters groups, while WHERE filters rows.",True-False,Medium,True,False,,1
+1,6,Which clause is used to filter results in SQL?,Multi-Select,Hard,WHERE,HAVING,SET,1
+2,7,VARCHAR(255) is used for storing variable-length strings.,True-False,Easy,True,False,,1
+2,7,Which of the following is a valid SQL data type?,Multi-Select,Easy,INT,TEXT,STRING,1
+2,8,Which statement belongs to Data Definition Language (DDL)?,Multi-Select,Hard,CREATE,DROP,INSERT,1
+2,8,DELETE removes a column from a table.,True-False,Easy,True,False,,2
+2,9,You can use INSERT to add multiple rows at once.,True-False,Medium,True,False,,1
+2,9,Which SQL statement is used to modify existing data?,Multi-Select,Medium,UPDATE,DELETE,CREATE,1
+3,10,An INNER JOIN returns only matching rows from both tables.,True-False,Easy,True,False,,1
+3,10,LEFT JOIN may return NULL values in right table columns.,True-False,Medium,True,False,,1
+3,10,SQL requires that joined columns have the same name.,True-False,Easy,True,False,,2
+3,11,Which clause is used when joining tables?,Multi-Select,Hard,ON,USING,IN,1
+3,11,What does a foreign key do?,Multi-Select,Hard,Links to a primary key in another table,Ensures referential integrity,Creates a new column,1
+3,12,DISTINCT removes duplicate rows from the result set.,True-False,Easy,True,False,,1
+3,12,UNION ALL removes duplicates between queries.,True-False,Medium,True,False,,2
+3,12,A subquery can appear inside a SELECT or WHERE clause.,True-False,Hard,True,False,,1
+3,13,Which of the following can be used to rename columns in SQL?,Multi-Select,Easy,AS,Alias,RENAME,1
+3,13,Which is a valid use case for subqueries?,Multi-Select,Medium,Filtering rows,Calculating values,Inserting a table,1
