@@ -1,5 +1,8 @@
--- Modules Table
+DROP TABLE IF EXISTS Problems;
+DROP TABLE IF EXISTS Units;
 DROP TABLE IF EXISTS Modules;
+
+-- Modules Table
 CREATE TABLE Modules (
     module_id INT PRIMARY KEY,
     module_title VARCHAR(100)
@@ -11,7 +14,6 @@ INSERT INTO Modules (module_id, module_title) VALUES
 (3, 'Joins & Advanced SQL');
 
 -- Units Table
-DROP TABLE IF EXISTS Units;
 CREATE TABLE Units (
     unit_id INT PRIMARY KEY,
     module_id INT,
@@ -38,7 +40,6 @@ INSERT INTO Units (unit_id, module_id, unit_title) VALUES
 (13, 3, 'Aliases and Result Formatting');
 
 -- Problems Table
-DROP TABLE IF EXISTS Problems;
 CREATE TABLE Problems (
     problem_id INT PRIMARY KEY AUTO_INCREMENT,
     unit_id INT,
@@ -49,7 +50,7 @@ CREATE TABLE Problems (
     choice2 VARCHAR(100) NOT NULL,
     choice3 VARCHAR(100),
     correct_answer TINYINT NOT NULL, -- index of correct choice (1/2/3)
-    created_by CHAR(36),
+    created_by INT(36),
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     FOREIGN KEY (unit_id) REFERENCES Units(unit_id) ON DELETE CASCADE,
     FOREIGN KEY (created_by) REFERENCES Users(user_id) ON DELETE SET NULL
