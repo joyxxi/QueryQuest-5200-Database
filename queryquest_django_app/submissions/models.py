@@ -1,14 +1,14 @@
 # submissions/models.py
 from django.db import models
 from problems.models import Problem
-from users.models import User  # 假设 User 模型代表学生
+from users.models import Student
 
 class Submission(models.Model):
     submission_id = models.AutoField(primary_key=True)  # 自定义主键
 
     # 外键关系
     problem = models.ForeignKey(Problem, on_delete=models.CASCADE)  # 关联问题
-    student = models.ForeignKey(User, on_delete=models.CASCADE)  # 关联学生
+    student = models.ForeignKey(Student, on_delete=models.CASCADE)  # 关联学生
 
     # 学生提交的答案（索引 1、2 或 3）
     submitted_answer = models.PositiveSmallIntegerField(choices=[(1, 'Choice 1'), (2, 'Choice 2'), (3, 'Choice 3')])
@@ -23,7 +23,7 @@ class Submission(models.Model):
         db_table = 'Submissions'  # 显式定义表名为 'Submissions'
 
     def __str__(self):
-        return f"Submission {self.submission_id} by student {self.student.user_id} for problem {self.problem.problem_id}"
+        return f"Submission {self.submission_id} by student {self.student.student_id} for problem {self.problem.problem_id}"
 
     def save(self, *args, **kwargs):
         # 在保存之前，获取问题的正确答案（索引 1、2 或 3）
