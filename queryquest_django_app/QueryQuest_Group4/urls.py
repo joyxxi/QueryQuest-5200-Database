@@ -35,6 +35,8 @@ urlpatterns = [
     # Include the progress app URLs
     path('progress/', include('progress.urls')),  
 
+    # Path to feedback app
+    path('feedback/', include('feedback.urls')),
 
     
 ]
