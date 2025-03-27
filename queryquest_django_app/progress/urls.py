@@ -4,11 +4,11 @@ from .views import ProgressView, CreateStudentWithProgressView, CreateProblemWit
 
 urlpatterns = [
     # URL for manage progress for a specific student and a specific problem
-    path('progress/<int:student_id>/<int:problem_id>/', ProgressView.as_view(), name='progress-detail'),
+    path('<int:student_id>/<int:problem_id>/', ProgressView.as_view(), name='progress-detail'),
     
     # URL for creating a student with progress for all problems
-    path('progress/create_student_with_progress/', CreateStudentWithProgressView.as_view(), name='create-student-with-progress'),
+    path('create_student_with_progress/', CreateStudentWithProgressView.as_view(), name='create-student-with-progress'),
     
     # URL for creating a problem with progress for all students
-    path('progress/create_problem_with_progress/', CreateProblemWithProgressView.as_view(), name='create-problem-with-progress'),
+    path('create_problem_with_progress/', CreateProblemWithProgressView.as_view(), name='create-problem-with-progress'),
 ]
