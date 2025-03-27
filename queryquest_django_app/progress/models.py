@@ -4,6 +4,7 @@ from problems.models import Problem  # Import Problem model from "problems" app
 
 class Progress(models.Model):
     # Define the fields
+    progress_id = models.AutoField(primary_key=True)
     student = models.ForeignKey(Student, to_field="student_id", on_delete=models.CASCADE, related_name="progress")
     problem = models.ForeignKey(Problem, to_field="problem_id", on_delete=models.CASCADE, related_name="progress")
     STATUS_CHOICES = [
@@ -18,8 +19,9 @@ class Progress(models.Model):
         db_table = 'Progress' 
         # student_id and problem_id is a composite unique key
         constraints = [models.UniqueConstraint(fields=['student', 'problem'], name='unique_progress')] 
+        managed = False
 
     def __str__(self):
-        return f"{self.student.student_id} - {self.problem.problem_id} - {self.status}"
+        return f"Progress {self.progress_id}: {self.student.student_id} - {self.problem.problem_id} - {self.status}"
 
 

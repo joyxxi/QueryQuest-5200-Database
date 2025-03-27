@@ -1,7 +1,7 @@
 from django.shortcuts import render, get_object_or_404
 from django.http import JsonResponse
 from .models import Progress
-from auth.models import Student  # Assuming you have a Student model
+from users.models import Student  # Assuming you have a Student model
 from problems.models import Problem  # Assuming you have a Problem model
 from django.views.decorators.csrf import csrf_exempt
 from django.utils import timezone

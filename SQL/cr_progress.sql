@@ -1,13 +1,14 @@
 -- Create Progress Table
 DROP TABLE IF EXISTS Progress;
 CREATE TABLE Progress (
+    progress_id INT AUTO_INCREMENT PRIMARY KEY,
     student_id INT NOT NULL,
     problem_id INT NOT NULL,
     status ENUM ('Incomplete', 'Complete') NOT NULL,
     complete_at TIMESTAMP DEFAULT NULL,
-    PRIMARY KEY (student_id, problem_id),
-    FOREIGN KEY (problem_id) REFERENCES Problems(problem_id),
-    FOREIGN KEY (student_id) REFERENCES Students(student_id)
+    UNIQUE(student_id, problem_id),
+    FOREIGN KEY (problem_id) REFERENCES Problems(problem_id) ON DELETE CASCADE,
+    FOREIGN KEY (student_id) REFERENCES Students(student_id) ON DELETE CASCADE
 );
 
 -- Initialize Progress Table
