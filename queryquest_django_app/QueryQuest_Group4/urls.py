@@ -25,17 +25,16 @@ urlpatterns = [
     path('api/login/', login, name='login'), 
     path('api/send_message/', send_message, name='send-message'),
 
-    # Path to get incorrect submissions for a specific student
-    path('submissions/incorrect/<str:student_id>/', views.incorrect_submissions, name='incorrect_submissions'),
-    
-    # Path to get all submissions for a specific problem
-    path('submissions/problem/<int:problem_id>/', views.problem_submissions, name='problem_submissions'),
-
     # Path to problems app
     path('problems/', include('problems.urls')),
 
+
+    # Path to submissions app
+    path('api/submissions/', include('submissions.urls')),
+
     # Include the progress app URLs
     path('progress/', include('progress.urls')),  
+
 
     
 ]
