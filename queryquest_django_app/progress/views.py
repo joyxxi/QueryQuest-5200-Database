@@ -56,57 +56,28 @@ class ProgressView(APIView):
         # Serialize the progress data
         serializer = ProgressSerializer(progress)
         return Response(serializer.data, status=status.HTTP_200_OK)
+   
+
+# Get all progress records for a given student
+class StudentProgressView(APIView):
+    def get(self, request, student_id):
+        try:
+            student = Student.objects.get(pk=student_id)
+        except Student.DoesNotExist:
+            raise NotFound(detail="Student not found.")
+        progress_records = Progress.objects.filter(student=student)
+        serializer = ProgressSerializer(progress_records, many=True)
+        return Response(serializer.data, status=status.HTTP_200_OK)
     
-class CreateStudentWithProgressView(APIView):
-    def post(self, request):
-        # Deserialize student data
-        serializer = UserSerializer(data=request.data)
-        
-        if serializer.is_valid():
-            # Save the new user (student in this case)
-            user = serializer.save()
-            if user.role == 'student':
-                student = user.student_profile  # This gives you the associated Student object
-                # Create Progress for each existing problem
-                problems = Problem.objects.all()
-                progress_list = []
-                for problem in problems:
-                    progress_list.append(Progress(
-                        student=student,
-                        problem=problem,
-                        status='Incomplete',  # Or default status
-                    ))
 
-                # Bulk create Progress records for this student
-                Progress.objects.bulk_create(progress_list)
+# Get all progress records for a given problem across all students
+class ProblemProgressView(APIView):
+    def get(self, request, problem_id):
+        try:
+            problem = Problem.objects.get(pk=problem_id)
+        except Problem.DoesNotExist:
+            raise NotFound(detail="Problem not found.")
 
-                return Response({"message": "Student created and progress initialized for all problems."}, status=status.HTTP_201_CREATED)
-
-        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
-
-
-class CreateProblemWithProgressView(APIView):
-    def post(self, request):
-        # Deserialize problem data
-        serializer = ProblemSerializer(data=request.data)
-        
-        if serializer.is_valid():
-            # Create the new problem
-            problem = serializer.save()
-
-            # Create Progress for all students for this problem
-            students = Student.objects.all()
-            progress_list = []
-            for student in students:
-                progress_list.append(Progress(
-                    student=student,
-                    problem=problem,
-                    status='Incomplete',  # Default status
-                ))
-
-            # Bulk create Progress records for all students
-            Progress.objects.bulk_create(progress_list)
-
-            return Response({"message": "Problem created and progress initialized for all students."}, status=status.HTTP_201_CREATED)
-
-        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+        progress_records = Progress.objects.filter(problem=problem)
+        serializer = ProgressSerializer(progress_records, many=True)
+        return Response(serializer.data, status=status.HTTP_200_OK)
