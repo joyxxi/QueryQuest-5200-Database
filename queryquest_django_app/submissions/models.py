@@ -23,7 +23,7 @@ class Submission(models.Model):
         db_table = 'Submissions'  # 显式定义表名为 'Submissions'
 
     def __str__(self):
-        return f"Submission {self.submission_id} by student {self.student.id} for problem {self.problem.problem_id}"
+        return f"Submission {self.submission_id} by student {self.student.user_id} for problem {self.problem.problem_id}"
 
     def save(self, *args, **kwargs):
         # 在保存之前，获取问题的正确答案（索引 1、2 或 3）
