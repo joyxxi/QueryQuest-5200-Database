@@ -25,8 +25,6 @@ function App() {
   );
 }
 
-export default App;
-
 // Layout that includes the sidebar for all pages except Signin and Signup
 function LayoutWithSidebar() {
   return (
@@ -43,3 +41,4 @@ function LayoutWithSidebar() {
     </div>
   );
 }
+export default App;

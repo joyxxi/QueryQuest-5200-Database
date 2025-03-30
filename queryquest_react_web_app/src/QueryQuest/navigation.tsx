@@ -12,10 +12,10 @@ export default function Navigation() {
         Problem
       </Link>
       <br />
-      <Link to="/QueryQuest/Submission" id="wd-submission-link">
+      {/* <Link to="/QueryQuest/Submission" id="wd-submission-link">
         Submission
       </Link>
-      <br />
+      <br /> */}
       <Link to="/QueryQuest/Message" id="wd-message-link">
         Message
       </Link>

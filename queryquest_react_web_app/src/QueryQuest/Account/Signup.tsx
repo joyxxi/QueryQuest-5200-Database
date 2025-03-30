@@ -6,6 +6,8 @@ export default function Signup() {
       <h3>Sign up</h3>
       <input placeholder="username" />
       <br />
+      <input placeholder="email" type="email" />
+      <br />
       <input placeholder="password" type="password" />
       <br />
       <input placeholder="verify password" type="password" />
