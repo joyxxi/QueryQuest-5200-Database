@@ -13,10 +13,10 @@ function App() {
         <Routes>
           <Route path="/" element={<Navigate to="QueryQuest/Signin" />} />
           {/* Standalone pages */}
-          <Route path="/Queryquest/Signin" element={<Signin />} />
-          <Route path="/Queryquest/Signup" element={<Signup />} />
+          <Route path="/QueryQuest/Signin" element={<Signin />} />
+          <Route path="/QueryQuest/Signup" element={<Signup />} />
           {/* Pages with Sidebar */}
-          <Route path="/Queryquest/*" element={<QueryQuest />} />
+          <Route path="/QueryQuest/*" element={<QueryQuest />} />
         </Routes>
       </div>
     </HashRouter>
