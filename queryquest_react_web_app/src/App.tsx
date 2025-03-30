@@ -1,26 +1,45 @@
 import React from "react";
 import logo from "./logo.svg";
 import "./App.css";
-
+import { HashRouter, Route, Routes, Navigate } from "react-router-dom";
+import Navigation from "./QueryQuest/Navigation";
+import Account from "./QueryQuest/Account";
+import Signin from "./QueryQuest/Account/Signin";
+import Signup from "./QueryQuest/Account/Signup";
+import Problem from "./QueryQuest/Problem";
+import Message from "./QueryQuest/Message";
 function App() {
   return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.tsx</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
-    </div>
+    <HashRouter>
+      <div>
+        <Routes>
+          <Route path="/" element={<Navigate to="QueryQuest/Signin" />} />
+          {/* Standalone pages */}
+          <Route path="/Queryquest/Signin" element={<Signin />} />
+          <Route path="/Queryquest/Signup" element={<Signup />} />
+          {/* Pages with Sidebar */}
+          <Route path="/Queryquest/*" element={<LayoutWithSidebar />} />
+        </Routes>
+      </div>
+    </HashRouter>
   );
 }
 
 export default App;
+
+// Layout that includes the sidebar for all pages except Signin and Signup
+function LayoutWithSidebar() {
+  return (
+    <div style={{ display: "flex" }}>
+      <Navigation />
+      <div style={{ flex: 1, padding: "20px" }}>
+        <Routes>
+          <Route path="Account/*" element={<Account />} />
+          <Route path="Problem" element={<Problem />} />
+          <Route path="Message" element={<Message />} />
+          <Route path="/" element={<Account />} /> {/* Default to Account */}
+        </Routes>
+      </div>
+    </div>
+  );
+}
