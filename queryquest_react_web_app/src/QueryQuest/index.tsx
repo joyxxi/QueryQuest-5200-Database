@@ -1,8 +1,9 @@
 import { Routes, Route, Navigate } from "react-router";
 import Account from "./Account";
-import Signin from "./Account/Signin";
-import Signup from "./Account/Signup";
 import Navigation from "./Navigation";
+import Problem from "./Problem";
+import Message from "./Message";
+
 export default function QueryQuest() {
   return (
     <div id="queryquest">
@@ -14,9 +15,9 @@ export default function QueryQuest() {
           <td valign="top">
             <Routes>
               <Route path="/" element={<Navigate to="Signin" />} />
-              <Route path="/Account/*" element={<Account />} />
-              <Route path="/Signin" element={<Signin />} />
-              <Route path="/Signup" element={<Signup />} />
+              <Route path="Account/*" element={<Account />} />
+              <Route path="Problem/*" element={<Problem />} />
+              <Route path="Message/*" element={<Message />} />
             </Routes>
           </td>
         </tr>
