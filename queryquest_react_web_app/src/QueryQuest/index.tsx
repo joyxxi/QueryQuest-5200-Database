@@ -1,7 +1,7 @@
 import { Routes, Route, Navigate } from "react-router";
 import "./styles.css";
 import Account from "./Account";
-import Navigation from "./Navigation";
+import Navigation from "./navigation";
 import Problem from "./Problem";
 import Message from "./Message";
 import ProblemDetail from "./Problem/ProblemDetail";
