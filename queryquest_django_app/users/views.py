@@ -5,7 +5,6 @@ from rest_framework.response import Response
 from rest_framework import status
 from .models import User, Student, Instructor, Admin, Message
 from .serializers import UserSerializer, MessageSerializer
-from django.contrib.auth.hashers import check_password
 
 @api_view(['POST'])
 def signup(request):
@@ -71,6 +70,12 @@ def login(request):
             {"status": "error", "message": "Incorrect password"},
             status=status.HTTP_401_UNAUTHORIZED
         )
+@api_view(['POST'])
+def logout(request):
+    return Response(
+        {"status": "success", "message": "Logged out successfully"},
+        status=status.HTTP_200_OK
+    )
 
 @api_view(['POST'])
 def send_message(request):
