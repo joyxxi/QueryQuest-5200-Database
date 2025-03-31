@@ -11,7 +11,7 @@ interface Problem {
 }
 
 const ProblemDetail: React.FC = () => {
-  const { id } = useParams(); // 从 URL 中获取问题的 ID
+  const { pid } = useParams(); // 从 URL 中获取问题的 ID
   const [problem, setProblem] = useState<Problem | null>(null);
   const [selectedOption, setSelectedOption] = useState<string | null>(null);
   const [resultMessage, setResultMessage] = useState<string | null>(null);
@@ -27,7 +27,7 @@ const ProblemDetail: React.FC = () => {
 
       // 模拟根据 ID 获取数据
       const problemData: Problem = {
-        id: Number(id), // 将 URL 中的 `id` 转换为数字
+        id: Number(pid), // 将 URL 中的 `id` 转换为数字
         content: `What is 2 + 2?`,
         options: ["A: 3", "B: 4", "C: 5"],
         correctAnswer: "B", // 正确答案为 B
@@ -36,10 +36,10 @@ const ProblemDetail: React.FC = () => {
       setProblem(problemData); // 设置问题数据
     };
 
-    if (id) {
+    if (pid) {
       fetchProblem();
     }
-  }, [id]); // 当 ID 改变时，重新获取数据
+  }, [pid]); // 当 ID 改变时，重新获取数据
 
   const handleOptionChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     setSelectedOption(event.target.value);
@@ -86,11 +86,25 @@ const ProblemDetail: React.FC = () => {
           ))}
         </form>
       </div>
-      <button className="submit-btn" onClick={handleSubmit}>Submit</button>
-      <button className="feedback-btn" onClick={handleFeedback}>Feedback</button>
+      <button className="submit-btn" onClick={handleSubmit}>
+        Submit
+      </button>
+      <button className="feedback-btn" onClick={handleFeedback}>
+        Feedback
+      </button>
 
-      {resultMessage && <p className={`result-message ${resultMessage === "Correct!" ? "correct" : "error"}`}>{resultMessage}</p>}
-      {showFeedback && <p className="feedback">This is feedback for the problem.</p>}
+      {resultMessage && (
+        <p
+          className={`result-message ${
+            resultMessage === "Correct!" ? "correct" : "error"
+          }`}
+        >
+          {resultMessage}
+        </p>
+      )}
+      {showFeedback && (
+        <p className="feedback">This is feedback for the problem.</p>
+      )}
     </div>
   );
 };
