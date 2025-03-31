@@ -5,6 +5,10 @@ import { IoIosMail } from "react-icons/io";
 import { TbBrandMysql } from "react-icons/tb";
 export default function Navigation() {
   const { pathname } = useLocation();
+  
+  // Added type assertion for TbBrandMysql (Solution 2)
+  const MySqlIcon = TbBrandMysql as React.ComponentType<React.SVGProps<SVGSVGElement>>; // Changed this line
+  
   const links = [
     {
       id: 0,
@@ -38,7 +42,7 @@ export default function Navigation() {
         className="list-group-item text-white
                    bg-primary text-center border-0"
       >
-        <TbBrandMysql className="fs-1 text text-white" />
+	<MySqlIcon className="fs-1 text text-white" /> {/* Changed this line */}
         <br />
         QueryQuest
       </Link>
