@@ -1,12 +1,11 @@
 from django.http import JsonResponse
-from django.views.decorators.http import require_GET
 from rest_framework.decorators import api_view
 from rest_framework.response import Response
 from rest_framework import status
 from users.models import User
 from .models import Message
 from .serializers import MessageSerializer
-from django.contrib.auth.hashers import check_password
+from django.db import connection
 
 @api_view(['POST'])
 def send_message(request):
@@ -50,3 +49,24 @@ def mark_as_read(request, message_id):
             {"status": "error", "message": "Message not found"},
             status=status.HTTP_404_NOT_FOUND
         )
+@api_view(['GET'])
+def select_all_users(request):
+    try:
+        with connection.cursor() as cursor:
+            # Execute raw SQL query
+            cursor.execute("SELECT username FROM Users")
+            rows = cursor.fetchall()
+            
+            # Extract usernames from query results
+            usernames = [row[0] for row in rows]
+            
+            return Response({
+                "status": "success",
+                "users": usernames
+            })
+            
+    except Exception as e:
+        return Response({
+            "status": "error",
+            "message": str(e)
+        }, status=500)
