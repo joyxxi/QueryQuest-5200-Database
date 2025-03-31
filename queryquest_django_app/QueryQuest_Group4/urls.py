@@ -18,7 +18,7 @@ from django.contrib import admin
 from django.urls import path, include
 from submissions import views
 from users.views import signup, login, logout
-from usermessages.views import send_message, mark_as_read, select_all_users
+from usermessages.views import send_message, mark_as_read, select_all_users, all_messages
 
 urlpatterns = [
     # path('admin/', admin.site.urls),
@@ -28,6 +28,7 @@ urlpatterns = [
     path('api/send_message/', send_message, name='send-message'),
     path('api/mark_as_read/<int:message_id>/', mark_as_read, name='mark_as_read'),
     path('api/allusers/', select_all_users, name='select_all_users'),
+    path('api/allmessages/', all_messages, name='all_messages'),
 
     # Path to problems app
     path('problems/', include('problems.urls')),

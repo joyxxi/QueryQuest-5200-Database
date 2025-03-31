@@ -70,3 +70,40 @@ def select_all_users(request):
             "status": "error",
             "message": str(e)
         }, status=500)
+    
+@api_view(['GET'])
+def all_messages(request):
+    try:
+        with connection.cursor() as cursor:
+            # Execute optimized SQL query with JOIN
+            query = """
+            SELECT 
+                m.message_id,
+                m.m_content,
+                m.created_at,
+                m.is_read,
+                sender.username as sender_username,
+                receiver.username as receiver_username
+            FROM 
+                Messages m
+            JOIN 
+                Users sender ON m.sender_id = sender.user_id
+            JOIN 
+                Users receiver ON m.receiver_id = receiver.user_id
+            ORDER BY 
+                m.created_at DESC
+            """
+            cursor.execute(query)
+            columns = [col[0] for col in cursor.description]  # Get column names
+            messages = [dict(zip(columns, row)) for row in cursor.fetchall()]
+            
+            return Response({
+                "status": "success",
+                "messages": messages
+            })
+            
+    except Exception as e:
+        return Response({
+            "status": "error",
+            "message": str(e)
+        }, status=500)
