@@ -49,6 +49,7 @@ INSTALLED_APPS = [
     'users',
     'progress',
     'feedback',
+    'usermessages'
 ]
 
 MIDDLEWARE = [

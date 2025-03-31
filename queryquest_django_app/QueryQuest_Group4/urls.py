@@ -17,7 +17,8 @@ Including another URLconf
 from django.contrib import admin
 from django.urls import path, include
 from submissions import views
-from users.views import signup, login, logout, send_message # Import the new view
+from users.views import signup, login, logout
+from usermessages.views import send_message, mark_as_read # Import the new view
 
 urlpatterns = [
     # path('admin/', admin.site.urls),
@@ -25,6 +26,7 @@ urlpatterns = [
     path('api/login/', login, name='login'), 
     path('api/logout/', logout, name='logout'),
     path('api/send_message/', send_message, name='send-message'),
+    path('api/mark_as_read/<int:message_id>/', mark_as_read, name='mark_as_read'),
 
     # Path to problems app
     path('problems/', include('problems.urls')),

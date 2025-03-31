@@ -16,3 +16,5 @@ queryquest_django_app/problems/migrations/__pycache__
 /queryquest_django_app/feedback/migrations/__pycache__
 /queryquest_django_app/progress/__pycache__
 /queryquest_django_app/progress/migrations/__pycache__
+/queryquest_django_app/usermessages/__pycache__
+/queryquest_django_app/usermessages/migrations/__pycache__
