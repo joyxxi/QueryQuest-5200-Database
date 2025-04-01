@@ -8,8 +8,6 @@ body * {
 
 @media (min-width: 768px) {
   #wd-queryquest .wd-main-content-offset {
-    padding-left: 140px !important;
+    padding-left: 150px !important;
   }
 }
-
-

@@ -3,12 +3,15 @@ import { FaRegCircleUser } from "react-icons/fa6";
 import { LuNotebookPen } from "react-icons/lu";
 import { IoIosMail } from "react-icons/io";
 import { TbBrandMysql } from "react-icons/tb";
+import { FaRobot } from "react-icons/fa";
 export default function Navigation() {
   const { pathname } = useLocation();
-  
+
   // Added type assertion for TbBrandMysql (Solution 2)
-  const MySqlIcon = TbBrandMysql as React.ComponentType<React.SVGProps<SVGSVGElement>>; // Changed this line
-  
+  const MySqlIcon = TbBrandMysql as React.ComponentType<
+    React.SVGProps<SVGSVGElement>
+  >; // Changed this line
+
   const links = [
     {
       id: 0,
@@ -28,12 +31,18 @@ export default function Navigation() {
       path: "/QueryQuest/Message",
       icon: IoIosMail,
     },
+    {
+      id: 3,
+      label: "Chatbot",
+      path: "/QueryQuest/Chatbot",
+      icon: FaRobot,
+    },
   ];
 
   return (
     <div
       id="wd-queryquest-navigation"
-      style={{ width: 120 }}
+      style={{ width: 150 }}
       className="list-group rounded-0 position-fixed bottom-0 top-0 d-none d-md-block bg-primary z-2"
     >
       <Link
@@ -42,7 +51,7 @@ export default function Navigation() {
         className="list-group-item text-white
                    bg-primary text-center border-0"
       >
-	<MySqlIcon className="fs-1 text text-white" /> {/* Changed this line */}
+        <MySqlIcon className="fs-1 text text-white" /> {/* Changed this line */}
         <br />
         QueryQuest
       </Link>
