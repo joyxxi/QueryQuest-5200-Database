@@ -1,12 +1,12 @@
-import { Routes, Route, Navigate } from "react-router";
-import Account from "./Account";
-import Navigation from "./Navigation";
-import Problem from "./Problem";
-import Message from "./Message";
-import ProblemDetail from "./Problem/ProblemDetail";
-import ProblemEditor from "./Problem/ProblemEditor";
-import MessageDetail from "./Message/MessageDetail";
-import MessageEditor from "./Message/MessageEditor";
+import { Routes, Route, Navigate } from 'react-router';
+import Account from './Account';
+import Navigation from './navigation';
+import Problem from './Problem';
+import Message from './Message';
+import ProblemDetail from './Problem/ProblemDetail';
+import ProblemEditor from './Problem/ProblemEditor';
+import MessageDetail from './Message/MessageDetail';
+import MessageEditor from './Message/MessageEditor';
 
 export default function QueryQuest() {
   return (
