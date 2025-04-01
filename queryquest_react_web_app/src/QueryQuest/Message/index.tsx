@@ -9,6 +9,10 @@ interface Message {
   receiver_username: string;
 }
 
+interface User {
+  username: string;
+}
+
 interface ApiResponse {
   status: string;
   messages: Message[];
@@ -23,6 +27,9 @@ export default function Message() {
     receiver: '',
     content: ''
   });
+
+  const [users, setUsers] = useState<User[]>([]);
+  const [loadingUsers, setLoadingUsers] = useState(false);
 
   // Fetch messages from Django backend
   useEffect(() => {
@@ -41,6 +48,26 @@ export default function Message() {
     };
 
     fetchMessages();
+  }, []);
+
+  // Fetch all users
+  useEffect(() => {
+    const fetchUsers = async () => {
+      setLoadingUsers(true);
+      try {
+        const response = await fetch('http://127.0.0.1:8000/api/allusers/');
+        const data = await response.json();
+        if (data.status === "success") {
+          setUsers(data.users.map((username: string) => ({ username })));
+        }
+      } catch (error) {
+        console.error('Error fetching users:', error);
+      } finally {
+        setLoadingUsers(false);
+      }
+    };
+
+    fetchUsers();
   }, []);
 
   const handleMessageClick = async (message: Message) => {
@@ -250,21 +277,48 @@ export default function Message() {
               <h3>New Message</h3>
               <button onClick={() => setShowPopup(false)} style={{ background: 'none', border: 'none', fontSize: '20px', cursor: 'pointer' }}>×</button>
             </div>
+            
+            {/* User Selection Dropdown - Now properly inside the white container */}
             <div style={{ marginBottom: '15px' }}>
               <label style={{ display: 'block', marginBottom: '5px' }}>To:</label>
-              <input
-                type="text"
-                value={newMessage.receiver}
-                onChange={(e) => setNewMessage({...newMessage, receiver: e.target.value})}
-                style={{ width: '100%', padding: '8px', boxSizing: 'border-box' }}
-              />
+              {loadingUsers ? (
+                <p>Loading users...</p>
+              ) : (
+                <select
+                  value={newMessage.receiver}
+                  onChange={(e) => setNewMessage({...newMessage, receiver: e.target.value})}
+                  style={{ 
+                    width: '100%', 
+                    padding: '8px',
+                    borderRadius: '4px',
+                    border: '1px solid #ddd',
+                    backgroundColor: 'white'
+                  }}
+                  required
+                >
+                  <option value="">Select a user</option>
+                  {users.map((user) => (
+                    <option key={user.username} value={user.username}>
+                      {user.username}
+                    </option>
+                  ))}
+                </select>
+              )}
             </div>
+
             <div style={{ marginBottom: '15px' }}>
               <label style={{ display: 'block', marginBottom: '5px' }}>Message:</label>
               <textarea
                 value={newMessage.content}
                 onChange={(e) => setNewMessage({...newMessage, content: e.target.value})}
-                style={{ width: '100%', padding: '8px', boxSizing: 'border-box', minHeight: '100px' }}
+                style={{ 
+                  width: '100%', 
+                  padding: '8px', 
+                  boxSizing: 'border-box', 
+                  minHeight: '100px',
+                  borderRadius: '4px',
+                  border: '1px solid #ddd'
+                }}
               />
             </div>
             <button
@@ -275,7 +329,8 @@ export default function Message() {
                 color: 'white',
                 border: 'none',
                 borderRadius: '4px',
-                cursor: 'pointer'
+                cursor: 'pointer',
+                width: '100%'
               }}
             >
               Send
