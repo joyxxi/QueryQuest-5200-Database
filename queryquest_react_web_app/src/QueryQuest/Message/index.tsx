@@ -1,133 +1,67 @@
 import React, { useState, useEffect } from 'react';
-
-interface Message {
-  message_id: number;
-  m_content: string;
-  created_at: string;
-  is_read: number; // 0 or 1
-  sender_username: string;
-  receiver_username: string;
-}
-
-interface User {
-  username: string;
-}
-
-interface ApiResponse {
-  status: string;
-  messages: Message[];
-}
+import {
+  fetchMessages,
+  fetchUsers,
+  markMessageAsRead,
+  sendMessage,
+  type Message,
+  User,
+  ApiResponse
+} from '../APIs/messageAPI';
 
 export default function Message() {
   const [apiResponse, setApiResponse] = useState<ApiResponse>({ status: '', messages: [] });
-  const [messages, setMessages] = useState<Message[]>([]);
   const [selectedMessage, setSelectedMessage] = useState<Message | null>(null);
   const [showPopup, setShowPopup] = useState(false);
   const [newMessage, setNewMessage] = useState({
     receiver: '',
     content: ''
   });
-
   const [users, setUsers] = useState<User[]>([]);
   const [loadingUsers, setLoadingUsers] = useState(false);
 
-  // Fetch messages from Django backend
+  // Fetch messages from backend
   useEffect(() => {
-    const fetchMessages = async () => {
-      try {
-        const response = await fetch('http://127.0.0.1:8000/api/allmessages/');
-        if (!response.ok) {
-          throw new Error('Network response was not ok');
-        }
-        const data: ApiResponse = await response.json();
-        setApiResponse(data);
-      } catch (error) {
-        console.error('Error fetching messages:', error);
-        setApiResponse({ status: 'error', messages: [] });
-      }
+    const loadMessages = async () => {
+      const data = await fetchMessages();
+      setApiResponse(data);
     };
-
-    fetchMessages();
+    loadMessages();
   }, []);
 
   // Fetch all users
   useEffect(() => {
-    const fetchUsers = async () => {
+    const loadUsers = async () => {
       setLoadingUsers(true);
-      try {
-        const response = await fetch('http://127.0.0.1:8000/api/allusers/');
-        const data = await response.json();
-        if (data.status === "success") {
-          setUsers(data.users.map((username: string) => ({ username })));
-        }
-      } catch (error) {
-        console.error('Error fetching users:', error);
-      } finally {
-        setLoadingUsers(false);
-      }
+      const userList = await fetchUsers();
+      setUsers(userList);
+      setLoadingUsers(false);
     };
-
-    fetchUsers();
+    loadUsers();
   }, []);
 
   const handleMessageClick = async (message: Message) => {
-    // Only proceed if message isn't already read
     if (message.is_read !== 1) {
-      try {
-        // Call your Django API to mark as read
-        const response = await fetch(
-          `http://127.0.0.1:8000/api/mark_as_read/${message.message_id}/`,
-          {
-            method: 'POST',
-            headers: {
-              'Content-Type': 'application/json',
-            },
-          }
+      const success = await markMessageAsRead(message.message_id);
+      if (success) {
+        const updatedMessages = apiResponse.messages.map(msg => 
+          msg.message_id === message.message_id ? { ...msg, is_read: 1 } : msg
         );
-  
-        if (response.ok) {
-          // Update local state only after successful API call
-          const updatedMessages = messages.map(msg => 
-            msg.message_id === message.message_id ? { ...msg, is_read: 1 } : msg
-          );
-          setMessages(updatedMessages);
-          setSelectedMessage({ ...message, is_read: 1 });
-        } else {
-          console.error('Failed to mark message as read');
-        }
-      } catch (error) {
-        console.error('Error marking message as read:', error);
+        setApiResponse({...apiResponse, messages: updatedMessages});
+        setSelectedMessage({ ...message, is_read: 1 });
       }
     } else {
-      // Message is already read, just select it
       setSelectedMessage(message);
     }
   };
 
   const handleSendMessage = async () => {
-    try {
-      const response = await fetch('http://127.0.0.1:8000/api/allmessages/', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          receiver_username: newMessage.receiver,
-          m_content: newMessage.content
-        }),
-      });
-
-      if (response.ok) {
-        // Refresh messages after sending
-        const updatedResponse = await fetch('http://127.0.0.1:8000/api/allmessages/');
-        const updatedData: ApiResponse = await updatedResponse.json();
-        setApiResponse(updatedData);
-        
-        setShowPopup(false);
-        setNewMessage({ receiver: '', content: '' });
-      }
-    } catch (error) {
-      console.error('Error sending message:', error);
+    const success = await sendMessage(newMessage.receiver, newMessage.content);
+    if (success) {
+      const updatedData = await fetchMessages();
+      setApiResponse(updatedData);
+      setShowPopup(false);
+      setNewMessage({ receiver: '', content: '' });
     }
   };
 
@@ -278,7 +212,6 @@ export default function Message() {
               <button onClick={() => setShowPopup(false)} style={{ background: 'none', border: 'none', fontSize: '20px', cursor: 'pointer' }}>×</button>
             </div>
             
-            {/* User Selection Dropdown - Now properly inside the white container */}
             <div style={{ marginBottom: '15px' }}>
               <label style={{ display: 'block', marginBottom: '5px' }}>To:</label>
               {loadingUsers ? (
