@@ -3,8 +3,8 @@ from django.views.decorators.http import require_GET
 from rest_framework.decorators import api_view
 from rest_framework.response import Response
 from rest_framework import status
-from .models import User, Student, Instructor, Admin, Message
-from .serializers import UserSerializer, MessageSerializer
+from .models import User, Student, Instructor, Admin
+from .serializers import UserSerializer
 
 @api_view(['POST'])
 def signup(request):
@@ -75,31 +75,4 @@ def logout(request):
     return Response(
         {"status": "success", "message": "Logged out successfully"},
         status=status.HTTP_200_OK
-    )
-
-@api_view(['POST'])
-def send_message(request):
-    serializer = MessageSerializer(data=request.data)
-    
-    if not serializer.is_valid():
-        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
-    
-    try:
-        sender = User.objects.get(username=serializer.validated_data['sender_username'])
-        receiver = User.objects.get(username=serializer.validated_data['receiver_username'])
-    except User.DoesNotExist:
-        return Response(
-            {"status": "error", "message": "Sender or receiver does not exist"},
-            status=status.HTTP_404_NOT_FOUND
-        )
-    
-    message = Message.objects.create(
-        sender=sender,
-        receiver=receiver,
-        m_content=serializer.validated_data['m_content']
-    )
-    
-    return Response(
-        {"status": "success", "message_id": message.id},
-        status=status.HTTP_201_CREATED
     )

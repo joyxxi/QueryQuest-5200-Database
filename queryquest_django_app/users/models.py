@@ -55,15 +55,3 @@ class Admin(models.Model):
 
     class Meta:
         db_table = 'Admins'
-            
-class Message(models.Model):
-    sender = models.ForeignKey('User', on_delete=models.CASCADE, related_name='sent_messages')
-    receiver = models.ForeignKey('User', on_delete=models.CASCADE, related_name='received_messages')
-    m_content = models.TextField()
-    created_at = models.DateTimeField(auto_now_add=True)
-    
-    class Meta:
-        db_table = 'Messages'  # This matches your existing table name
-    
-    def __str__(self):
-        return f"From {self.sender} to {self.receiver}: {self.m_content[:20]}..."
