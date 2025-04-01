@@ -39,16 +39,16 @@ def send_message(request):
 def mark_as_read(request, message_id):
     try:
         message = Message.objects.get(message_id=message_id)
-            
-        message.is_read = 1
-        message.save()
+        if message.is_read != 1:  # Only update if not already read
+            message.is_read = 1
+            message.save()
         return Response({"status": "success"})
-        
     except Message.DoesNotExist:
         return Response(
             {"status": "error", "message": "Message not found"},
             status=status.HTTP_404_NOT_FOUND
         )
+    
 @api_view(['GET'])
 def select_all_users(request):
     try:

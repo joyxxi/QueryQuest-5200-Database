@@ -16,6 +16,7 @@ interface ApiResponse {
 
 export default function Message() {
   const [apiResponse, setApiResponse] = useState<ApiResponse>({ status: '', messages: [] });
+  const [messages, setMessages] = useState<Message[]>([]);
   const [selectedMessage, setSelectedMessage] = useState<Message | null>(null);
   const [showPopup, setShowPopup] = useState(false);
   const [newMessage, setNewMessage] = useState({
@@ -42,18 +43,38 @@ export default function Message() {
     fetchMessages();
   }, []);
 
-  const handleMessageClick = (message: Message) => {
-    // Mark as read when clicked
-    if (message.is_read === 0) {
-      const updatedMessages = apiResponse.messages.map(msg => 
-        msg.message_id === message.message_id ? {...msg, is_read: 1} : msg
-      );
-      setApiResponse({...apiResponse, messages: updatedMessages});
-      
-      // API call to update read status would go here
+  const handleMessageClick = async (message: Message) => {
+    // Only proceed if message isn't already read
+    if (message.is_read !== 1) {
+      try {
+        // Call your Django API to mark as read
+        const response = await fetch(
+          `http://127.0.0.1:8000/api/mark_as_read/${message.message_id}/`,
+          {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+            },
+          }
+        );
+  
+        if (response.ok) {
+          // Update local state only after successful API call
+          const updatedMessages = messages.map(msg => 
+            msg.message_id === message.message_id ? { ...msg, is_read: 1 } : msg
+          );
+          setMessages(updatedMessages);
+          setSelectedMessage({ ...message, is_read: 1 });
+        } else {
+          console.error('Failed to mark message as read');
+        }
+      } catch (error) {
+        console.error('Error marking message as read:', error);
+      }
+    } else {
+      // Message is already read, just select it
+      setSelectedMessage(message);
     }
-    
-    setSelectedMessage(message);
   };
 
   const handleSendMessage = async () => {

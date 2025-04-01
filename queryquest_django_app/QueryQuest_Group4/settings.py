@@ -70,6 +70,13 @@ MIDDLEWARE = [
 
 ROOT_URLCONF = 'QueryQuest_Group4.urls'
 
+AUTH_PASSWORD_VALIDATORS = [
+    # Remove or comment out CommonPasswordValidator
+    {
+       'NAME': 'django.contrib.auth.password_validation.CommonPasswordValidator',
+    },
+]
+
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
