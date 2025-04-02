@@ -2,8 +2,11 @@ from django.shortcuts import render, get_object_or_404, get_list_or_404
 from rest_framework import viewsets, permissions, status
 from rest_framework.response import Response
 from rest_framework.decorators import action
+from rest_framework.decorators import api_view
 from .models import Problem, Unit, Module
-from .serializers import ProblemSerializer
+from .serializers import ProblemSerializer, ProblemListSerializer
+from users.models import Student
+from progress.models import Progress
 
 class IsInstructorOrAdmin(permissions.BasePermission):
     """
@@ -16,8 +19,8 @@ class IsInstructorOrAdmin(permissions.BasePermission):
 class ProblemViewSet(viewsets.ModelViewSet):
     """ A viewset that provides CRUD operations for Problem objects. """
     queryset = Problem.objects.all()
-    serializer_class = ProblemSerializer
-
+    serializer_class = ProblemSerializer    
+    
     # def get_permissions(self):
     #     """ Assign permissions based on the action. """
     #     if self.action in ['create', 'update', 'partial_update', 'destroy']:
@@ -93,3 +96,30 @@ class ProblemViewSet(viewsets.ModelViewSet):
             return {'error': f'correct_answer must be 1, 2, or 3'}
         else:
             return {}
+
+@api_view(['GET'])
+def get_all_with_progress(request, student_id):
+    '''
+    Fetch all problems with progress for a specific student order by unit.
+    '''
+    try:
+        student = get_object_or_404(Student, student_id=student_id)
+    except Student.DoesNotExist:
+        return Response({"error": "Student {student_id} not found"}, status=status.HTTP_404_NOT_FOUND)
+    
+    problems = Problem.objects.select_related('unit__module').order_by('unit__unit_id')
+    progress_records = Progress.objects.filter(student=student)
+
+    # Create a dictionary to map problem_id to its progress status
+    progress_map = {progress.problem.problem_id: progress.status for progress in progress_records}
+
+    serializer = ProblemListSerializer(problems, many=True, context={'request': request})
+
+    # Add progress status to each problem
+    problems_with_progress = []
+    for problem in serializer.data:
+        problem_id = problem['problem_id']
+        problem['status'] = progress_map.get(problem_id, 'Incomplete')
+        problems_with_progress.append(problem)
+
+    return Response(problems_with_progress, status=status.HTTP_200_OK)

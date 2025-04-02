@@ -1,17 +1,27 @@
-import { Box, Typography, useTheme } from "@mui/material";
-import { DataGrid, GridColDef } from "@mui/x-data-grid";
-import { tokens } from "../../theme";
-import { mockDataProblems } from "../MockData/MockProblems";
-import { useNavigate } from "react-router-dom";
+import { Box, Typography } from '@mui/material';
+import { DataGrid, GridColDef } from '@mui/x-data-grid';
+import { tokens } from '../../theme';
+import { mockDataProblems } from '../MockData/MockProblems';
+import { useNavigate } from 'react-router-dom';
+import { useSelector } from 'react-redux';
+import { useEffect, useState } from 'react';
+import { fetchProblemsWithProgress, Problem } from './problemAPI';
 
-const Problem = () => {
-  // const theme = useTheme();
+const ProblemList = () => {
   const colors = tokens;
   const navigate = useNavigate();
 
   const columns: GridColDef[] = [
-    { field: "module", headerName: "Module", minWidth: 150, flex: 1 },
-    { field: "unit", headerName: "Unit", minWidth: 100, flex: 0.5 },
+    { field: 'module_title', headerName: 'Module', minWidth: 150, flex: 1 },
+    {
+      field: 'unit_id',
+      headerName: 'Unit ID',
+      type: 'number',
+      headerAlign: 'left',
+      align: 'left',
+      flex: 0.4,
+    },
+    { field: 'unit_title', headerName: 'Unit', minWidth: 150, flex: 1 },
     // {
     //   field: 'problem_id',
     //   headerName: 'Problem ID',
@@ -20,29 +30,42 @@ const Problem = () => {
     //   align: 'left',
     // },
     {
-      field: "problem_discription",
-      headerName: "Problem",
-      minWidth: 500,
+      field: 'description',
+      headerName: 'Problem',
+      minWidth: 450,
       flex: 1,
     },
-    { field: "difficulty", headerName: "Difficulty" },
-    { field: "status", headerName: "Status" }, // TODO: change according to progress later
+    { field: 'difficulty', headerName: 'Difficulty' },
+    { field: 'status', headerName: 'Status' }, // TODO: change according to progress later
   ];
 
+  const { currentUser } = useSelector((state: any) => state.accountReducer);
+  const user_id = currentUser?.user_id;
+
+  // TODO: add logic to check if it is student
+  const student_id = user_id;
+  const [problems, setProblems] = useState<Problem[]>([]);
+
+  useEffect(() => {
+    const loadProblems = async () => {
+      const problemsData = await fetchProblemsWithProgress(student_id);
+      setProblems(problemsData);
+    };
+
+    loadProblems();
+  }, [student_id]);
+
   return (
-    <Box sx={{ width: "100%", overflow: "auto" }}>
+    <Box sx={{ width: '100%', overflow: 'auto' }}>
       {/* Header */}
       <Box mb="30px">
         <Typography
-          variant="h2"
+          variant="h3"
           color={colors.grey[100]}
           fontWeight="bold"
-          sx={{ m: "0 0 5px 0" }}
+          sx={{ m: '0 0 5px 0' }}
         >
-          {"Problems"}
-        </Typography>
-        <Typography variant="h5" color={colors.greenAccent[400]}>
-          {"List of SQL problems"}
+          {'Problems'}
         </Typography>
       </Box>
       {/* Probrom List */}
@@ -50,22 +73,22 @@ const Problem = () => {
         m="20px 0 0 0"
         height="75vh"
         sx={{
-          width: "100%",
-          "& .MuiDataGrid-root": {
-            border: "none",
+          width: '100%',
+          '& .MuiDataGrid-root': {
+            border: 'none',
           },
-          "& .MuiDataGrid-cell": {
-            borderBottom: "none",
+          '& .MuiDataGrid-cell': {
+            borderBottom: 'none',
           },
-          "& .MuiDataGrid-columnHeaders": {
+          '& .MuiDataGrid-columnHeaders': {
             backgroundColor: colors.blueAccent[700],
-            borderBottom: "none",
+            borderBottom: 'none',
           },
-          cursor: "pointer",
+          cursor: 'pointer',
         }}
       >
         <DataGrid
-          rows={mockDataProblems}
+          rows={problems}
           columns={columns}
           getRowId={(row) => row.problem_id}
           pageSizeOptions={[8, 16, 32]}
@@ -75,7 +98,7 @@ const Problem = () => {
     </Box>
   );
 };
-export default Problem;
+export default ProblemList;
 
 // export default function Problem() {
 //   return (
