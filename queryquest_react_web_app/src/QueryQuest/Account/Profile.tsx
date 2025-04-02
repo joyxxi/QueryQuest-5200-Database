@@ -35,10 +35,7 @@ export default function Profile() {
               className="form-control mb-3"
               defaultValue={profile.username}
               placeholder="Username"
-              disabled={!editMode}
-              onChange={(e) =>
-                setProfile({ ...profile, username: e.target.value })
-              }
+              disabled={true}
             />
             <input
               id="wd-profile-email"
