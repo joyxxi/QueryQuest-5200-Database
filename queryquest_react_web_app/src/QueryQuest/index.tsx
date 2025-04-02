@@ -17,7 +17,7 @@ export default function QueryQuest() {
 
       <div className="wd-main-content-offset p-3">
         <Routes>
-          {/* <Route path="/" element={<Navigate to="Signin" />} /> */}
+          <Route path="/" element={<Navigate to="Account" />} />
           <Route path="Account/*" element={<Account />} />
           <Route path="Problem" element={<Problem />} />
           <Route path="Problem/:pid" element={<ProblemDetail />} />
