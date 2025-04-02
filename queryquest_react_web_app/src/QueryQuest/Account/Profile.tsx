@@ -30,6 +30,7 @@ export default function Profile() {
         <h3 className="text-center mb-4">Profile</h3>
         {profile && (
           <div>
+            {/* user cannot edit username */}
             <input
               id="wd-profile-username"
               className="form-control mb-3"
