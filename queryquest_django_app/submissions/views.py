@@ -3,6 +3,8 @@ from rest_framework.response import Response
 from rest_framework.decorators import action
 from .models import Submission
 from .serializers import SubmissionSerializer
+from progress.models import Progress
+from django.utils.timezone import now
 
 class SubmissionViewSet(viewsets.ModelViewSet):
     queryset = Submission.objects.all()
@@ -30,6 +32,23 @@ class SubmissionViewSet(viewsets.ModelViewSet):
             student_id=data.get('student'),
             submitted_answer=data.get('submitted_answer'),
         )
+
+        # If the submission is correct, update progress
+        if submission.result == 'T':
+            try:
+                progress = Progress.objects.get(student=submission.student, problem=submission.problem)
+                if progress.status == 'Incomplete':
+                    progress.status = 'Complete'
+                    progress.complete_at = now()
+                    progress.save()
+            except Progress.DoesNotExist:
+                # If no progress entry exists, create one
+                Progress.objects.create(
+                    student=submission.student,
+                    problem=submission.problem,
+                    status='Complete',
+                    complete_at=now()
+                )
 
         # 自动计算并保存 result（由 save() 方法完成）
         submission.save()
