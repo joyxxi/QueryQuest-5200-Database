@@ -7,7 +7,7 @@ import {
   type Message,
   User,
   ApiResponse
-} from '../APIs/messageAPI';
+} from '../apis/messageAPI';
 
 export default function Message() {
   const [apiResponse, setApiResponse] = useState<ApiResponse>({ status: '', messages: [] });
