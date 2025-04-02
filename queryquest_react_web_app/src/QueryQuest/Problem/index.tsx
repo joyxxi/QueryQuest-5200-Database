@@ -1,8 +1,8 @@
-import { Box, Typography, useTheme } from '@mui/material';
-import { DataGrid, GridColDef } from '@mui/x-data-grid';
-import { tokens } from '../../theme';
-import { mockDataProblems } from '../../MockData/MockProblems';
-import { useNavigate } from 'react-router-dom';
+import { Box, Typography, useTheme } from "@mui/material";
+import { DataGrid, GridColDef } from "@mui/x-data-grid";
+import { tokens } from "../../theme";
+import { mockDataProblems } from "../MockData/MockProblems";
+import { useNavigate } from "react-router-dom";
 
 const Problem = () => {
   // const theme = useTheme();
@@ -10,8 +10,8 @@ const Problem = () => {
   const navigate = useNavigate();
 
   const columns: GridColDef[] = [
-    { field: 'module', headerName: 'Module', minWidth: 150, flex: 1 },
-    { field: 'unit', headerName: 'Unit', minWidth: 100, flex: 0.5 },
+    { field: "module", headerName: "Module", minWidth: 150, flex: 1 },
+    { field: "unit", headerName: "Unit", minWidth: 100, flex: 0.5 },
     // {
     //   field: 'problem_id',
     //   headerName: 'Problem ID',
@@ -20,29 +20,29 @@ const Problem = () => {
     //   align: 'left',
     // },
     {
-      field: 'problem_discription',
-      headerName: 'Problem',
+      field: "problem_discription",
+      headerName: "Problem",
       minWidth: 500,
       flex: 1,
     },
-    { field: 'difficulty', headerName: 'Difficulty' },
-    { field: 'status', headerName: 'Status' }, // TODO: change according to progress later
+    { field: "difficulty", headerName: "Difficulty" },
+    { field: "status", headerName: "Status" }, // TODO: change according to progress later
   ];
 
   return (
-    <Box sx={{ width: '100%', overflow: 'auto' }}>
+    <Box sx={{ width: "100%", overflow: "auto" }}>
       {/* Header */}
       <Box mb="30px">
         <Typography
           variant="h2"
           color={colors.grey[100]}
           fontWeight="bold"
-          sx={{ m: '0 0 5px 0' }}
+          sx={{ m: "0 0 5px 0" }}
         >
-          {'Problems'}
+          {"Problems"}
         </Typography>
         <Typography variant="h5" color={colors.greenAccent[400]}>
-          {'List of SQL problems'}
+          {"List of SQL problems"}
         </Typography>
       </Box>
       {/* Probrom List */}
@@ -50,18 +50,18 @@ const Problem = () => {
         m="20px 0 0 0"
         height="75vh"
         sx={{
-          width: '100%',
-          '& .MuiDataGrid-root': {
-            border: 'none',
+          width: "100%",
+          "& .MuiDataGrid-root": {
+            border: "none",
           },
-          '& .MuiDataGrid-cell': {
-            borderBottom: 'none',
+          "& .MuiDataGrid-cell": {
+            borderBottom: "none",
           },
-          '& .MuiDataGrid-columnHeaders': {
+          "& .MuiDataGrid-columnHeaders": {
             backgroundColor: colors.blueAccent[700],
-            borderBottom: 'none',
+            borderBottom: "none",
           },
-          cursor: 'pointer',
+          cursor: "pointer",
         }}
       >
         <DataGrid
