@@ -39,11 +39,11 @@ const ProblemList = () => {
     { field: 'status', headerName: 'Status' }, // TODO: change according to progress later
   ];
 
-  // TODO: change to current user id later
-  const student_id = 1;
   const { currentUser } = useSelector((state: any) => state.accountReducer);
-  console.log(currentUser);
+  const user_id = currentUser?.user_id;
 
+  // TODO: add logic to check if it is student
+  const student_id = user_id;
   const [problems, setProblems] = useState<Problem[]>([]);
 
   useEffect(() => {
