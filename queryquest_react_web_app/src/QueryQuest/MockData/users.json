@@ -1,0 +1,37 @@
+[
+  {
+    "user_id": 1,
+    "role": "student",
+    "username": "john",
+    "email": "john@example.com",
+    "password": "123"
+  },
+  {
+    "user_id": 2,
+    "role": "instructor",
+    "username": "smith",
+    "email": "smith@example.com",
+    "password": "234"
+  },
+  {
+    "user_id": 3,
+    "role": "admin",
+    "username": "admin1",
+    "email": "admin1@example.com",
+    "password": "345"
+  },
+  {
+    "user_id": 4,
+    "role": "student",
+    "username": "jane_doe",
+    "email": "jane.doe@example.com",
+    "password": "456"
+  },
+  {
+    "user_id": 5,
+    "role": "instructor",
+    "username": "dr_brown",
+    "email": "brown.dr@example.com",
+    "password": "789"
+  }
+]
