@@ -14,7 +14,7 @@ function App() {
       <HashRouter>
         <div>
           <Routes>
-            <Route path="/" element={<Navigate to="QueryQuest/Signin" />} />
+            <Route path="/" element={<Navigate to="/QueryQuest/Signin" />} />
             {/* Standalone pages */}
             <Route path="/QueryQuest/Signin" element={<Signin />} />
             <Route path="/QueryQuest/Signup" element={<Signup />} />

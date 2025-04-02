@@ -1,6 +1,26 @@
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
+import { useState, useEffect } from "react";
+import { useSelector, useDispatch } from "react-redux";
+import { setCurrentUser } from "./reducer";
 
 export default function Profile() {
+  const [profile, setProfile] = useState<any>({});
+  const dispatch = useDispatch();
+  const navigate = useNavigate();
+  const { currentUser } = useSelector((state: any) => state.accountReducer);
+  const [editMode, setEditMode] = useState(false);
+  const fetchProfile = () => {
+    if (!currentUser) return navigate("QueryQuest/Signin");
+    setProfile(currentUser);
+  };
+  const signout = () => {
+    dispatch(setCurrentUser(null));
+    navigate("/QueryQuest/Signin");
+  };
+  useEffect(() => {
+    fetchProfile();
+  }, []);
+
   return (
     <div id="wd-profile-screen" className="d-flex align-items-center">
       <div
@@ -8,36 +28,68 @@ export default function Profile() {
         style={{ width: "350px" }}
       >
         <h3 className="text-center mb-4">Profile</h3>
+        {profile && (
+          <div>
+            <input
+              id="wd-profile-username"
+              className="form-control mb-3"
+              defaultValue={profile.username}
+              placeholder="Username"
+              disabled={!editMode}
+              onChange={(e) =>
+                setProfile({ ...profile, username: e.target.value })
+              }
+            />
+            <input
+              id="wd-profile-email"
+              className="form-control mb-3"
+              defaultValue={profile.email}
+              type="email"
+              disabled={!editMode}
+              onChange={(e) =>
+                setProfile({ ...profile, email: e.target.value })
+              }
+            />
+            <input
+              id="wd-profile-password"
+              className="form-control mb-3"
+              defaultValue={profile.password}
+              placeholder="Password"
+              type="password"
+              disabled={!editMode}
+              onChange={(e) =>
+                setProfile({ ...profile, password: e.target.value })
+              }
+            />
+            {/* user cannot edit role */}
+            <select
+              id="wd-profile-role"
+              className="form-select mb-3"
+              value={profile.role}
+              disabled={true}
+            >
+              <option value="admin">Admin</option>
+              <option value="instructor">Instructor</option>
+              <option value="student">Student</option>
+            </select>
 
-        <input
-          id="wd-profile-username"
-          className="form-control mb-3"
-          value="alice"
-          placeholder="Username"
-        />
-        <input
-          id="wd-profile-password"
-          className="form-control mb-3"
-          value="123"
-          placeholder="Password"
-          type="password"
-        />
-        <input
-          id="wd-profile-email"
-          className="form-control mb-3"
-          value="alice@wonderland"
-          type="email"
-        />
-
-        <select id="wd-profile-role" className="form-select mb-3">
-          <option value="ADMIN">Admin</option>
-          <option value="INSTRUCTOR">Instructor</option>
-          <option value="STUDENT">Student</option>
-        </select>
-
-        <Link to="/QueryQuest/Signin" className="btn btn-danger w-100">
-          Sign Out
-        </Link>
+            <div className="d-flex gap-2">
+              <button
+                onClick={() => setEditMode(!editMode)}
+                className="btn btn-primary w-50"
+              >
+                {editMode ? "Save" : "Edit"}
+              </button>
+              <button
+                onClick={signout}
+                className="btn btn-danger w-50"
+                id="wd-signout-btn"
+              >
+                Sign out
+              </button>
+            </div>
+          </div>
+        )}
       </div>
     </div>
   );
