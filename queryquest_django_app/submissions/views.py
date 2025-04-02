@@ -37,10 +37,17 @@ class SubmissionViewSet(viewsets.ModelViewSet):
         if submission.result == 'T':
             try:
                 progress = Progress.objects.get(student=submission.student, problem=submission.problem)
+                # if submission is correct for a problem for the first time, add point and update progress
                 if progress.status == 'Incomplete':
                     progress.status = 'Complete'
                     progress.complete_at = now()
                     progress.save()
+                    
+                    # Increment student's total_points only if this is the first time completing this problem
+                    student = submission.student.student_profile
+                    student.total_points += 1
+                    student.save()
+                
             except Progress.DoesNotExist:
                 # If no progress entry exists, create one
                 Progress.objects.create(
@@ -49,6 +56,10 @@ class SubmissionViewSet(viewsets.ModelViewSet):
                     status='Complete',
                     complete_at=now()
                 )
+                # Since it's the first correct submission for this problem, increment student's points
+                student = submission.student.student_profile
+                student.total_points += 1
+                student.save()
 
         # 自动计算并保存 result（由 save() 方法完成）
         submission.save()
