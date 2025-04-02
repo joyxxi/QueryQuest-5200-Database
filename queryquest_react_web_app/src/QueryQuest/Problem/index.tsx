@@ -1,11 +1,10 @@
 import { Box, Typography } from '@mui/material';
 import { DataGrid, GridColDef } from '@mui/x-data-grid';
 import { tokens } from '../../theme';
-import { mockDataProblems } from '../MockData/MockProblems';
 import { useNavigate } from 'react-router-dom';
 import { useSelector } from 'react-redux';
 import { useEffect, useState } from 'react';
-import { fetchProblemsWithProgress, Problem } from './problemAPI';
+import { fetchProblemsWithProgress, Problem } from '../APIs/problemAPI';
 
 const ProblemList = () => {
   const colors = tokens;
@@ -40,6 +39,7 @@ const ProblemList = () => {
   ];
 
   const { currentUser } = useSelector((state: any) => state.accountReducer);
+  console.log(currentUser);
   const user_id = currentUser?.user_id;
 
   // TODO: add logic to check if it is student
