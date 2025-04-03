@@ -29,11 +29,17 @@ DEBUG = True
 
 ALLOWED_HOSTS = ['*']
 
+# Allow credentials (cookies, headers, etc.)
+CORS_ALLOW_CREDENTIALS = True
+
 CORS_ALLOWED_ORIGINS = [
     "http://localhost:3000",
     "http://127.0.0.1:3000",
 ]
-CORS_ALLOW_ALL_ORIGINS = True
+CSRF_TRUSTED_ORIGINS = [
+    "http://localhost:3000"
+]
+
 # Application definition
 
 INSTALLED_APPS = [
@@ -69,6 +75,14 @@ MIDDLEWARE = [
 ]
 
 ROOT_URLCONF = 'QueryQuest_Group4.urls'
+
+# session management
+SESSION_ENGINE = "django.contrib.sessions.backends.db"  # Store sessions in DB
+SESSION_COOKIE_AGE = 86400  # Session expires in 1 day
+SESSION_COOKIE_HTTPONLY = True  # Prevent JavaScript access (Security)
+SESSION_SAVE_EVERY_REQUEST = True  # Refresh session expiry on every request
+SESSION_EXPIRE_AT_BROWSER_CLOSE = True  # Destroy session when browser is closed
+
 
 TEMPLATES = [
     {
