@@ -77,7 +77,7 @@ SESSION_ENGINE = "django.contrib.sessions.backends.db"  # Store sessions in DB
 SESSION_COOKIE_AGE = 86400  # Session expires in 1 day
 SESSION_COOKIE_HTTPONLY = True  # Prevent JavaScript access (Security)
 SESSION_SAVE_EVERY_REQUEST = True  # Refresh session expiry on every request
-SESSION_EXPIRE_AT_BROWSER_CLOSE = False  # Keep session after closing browser
+SESSION_EXPIRE_AT_BROWSER_CLOSE = True  # Destroy session when browser is closed
 
 
 TEMPLATES = [

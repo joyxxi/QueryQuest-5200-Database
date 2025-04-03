@@ -1,5 +1,5 @@
 from django.http import JsonResponse
-from django.views.decorators.http import require_GET
+
 from rest_framework.decorators import api_view
 from rest_framework.response import Response
 from rest_framework import status
@@ -50,6 +50,9 @@ def signup(request):
             Admin.objects.create(
                 admin_id=user
             )
+        # Start a session after successful signup
+        request.session['user_id'] = str(user.user_id)
+        request.session['role'] = user.role
 
         return Response({"status": "success", "user_id": user.user_id, "role": user.role}, status=status.HTTP_201_CREATED)
     
@@ -77,7 +80,9 @@ def login(request):
     # Compare passwords (plaintext comparison - not recommended for production)
     # In production, you should use check_password() with hashed passwords
     if user.password == password:
-        login(request, user)  # Create session
+        # Store user info in session
+        request.session['user_id'] = str(user.user_id)
+        request.session['role'] = user.role
         return Response(
             {"status": "success", "message": "Login successful", "user_id": user.user_id, "role": user.role},
             status=status.HTTP_200_OK
@@ -89,6 +94,7 @@ def login(request):
         )
 @api_view(['POST'])
 def logout(request):
+    request.session.flush()  # Clears session data
     return Response(
         {"status": "success", "message": "Logged out successfully"},
         status=status.HTTP_200_OK
@@ -119,6 +125,40 @@ def getUserById(request, user_id):
         return Response(user_data, status=status.HTTP_200_OK)
     except User.DoesNotExist:
         return Response({"status": "error", "message": "User not found"}, status=status.HTTP_404_NOT_FOUND)
+    
+@api_view(['GET'])
+def profile(request):
+    """Retrieve user details from session"""
+    user_id = request.session.get('user_id')
+
+    if not user_id:
+        return Response({"status": "error", "message": "User not logged in"}, status=status.HTTP_401_UNAUTHORIZED)
+
+    try:
+        user = User.objects.get(user_id=int(user_id))
+        user_data = {
+            "user_id": user.user_id,
+            "username": user.username,
+            "email": user.email,
+            "role": user.role
+        }
+
+        if user.role == 'student':
+            student_profile = Student.objects.get(student_id=user)
+            user_data.update({
+                "current_level": student_profile.current_level,
+                "total_points": student_profile.total_points
+            })
+        elif user.role == 'instructor':
+            user_data["instructor_profile"] = "Exists"
+        elif user.role == 'admin':
+            user_data["admin_profile"] = "Exists"
+
+        return Response(user_data, status=status.HTTP_200_OK)
+
+    except User.DoesNotExist:
+        return Response({"status": "error", "message": "User not found"}, status=status.HTTP_404_NOT_FOUND)
+
 
 
 @api_view(['DELETE'])
