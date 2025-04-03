@@ -55,8 +55,9 @@ def generate_llm_feedback(submission):
     correct_answer_index = problem.correct_answer
     choices = [problem.choice1, problem.choice2, problem.choice3]
     correct_answer = choices[correct_answer_index - 1]
-    student_answer = submission.submitted_answer
+    student_answer = choices[submission.submitted_answer - 1]
 
+    # print(f"Correct Answer: {correct_answer}, student_answer: {student_answer}")
     # set prompt
     if student_answer == correct_answer:
         prompt = f"""
