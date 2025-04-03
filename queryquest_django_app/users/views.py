@@ -1,5 +1,4 @@
 from django.http import JsonResponse
-from django.views.decorators.http import require_GET
 from rest_framework.decorators import api_view
 from rest_framework.response import Response
 from rest_framework import status
@@ -8,6 +7,29 @@ from .serializers import UserSerializer
 
 @api_view(['POST'])
 def signup(request):
+    # Extract data from the request
+    username = request.data.get('username')
+    email = request.data.get('email')
+    password = request.data.get('password')
+    role = request.data.get('role', 'admin')
+
+    if not username or not email or not password:
+            return Response(
+                {"status": "error", "message": "All fields are required"},
+                status=status.HTTP_400_BAD_REQUEST
+            )
+    # Check if user already exists with the same username or email
+    if User.objects.filter(username=username).exists():
+        return Response(
+            {"status": "error", "message": "Username is already taken"},
+            status=status.HTTP_400_BAD_REQUEST
+        )
+    if User.objects.filter(email=email).exists():
+        return Response(
+            {"status": "error", "message": "Email is already registered"},
+            status=status.HTTP_400_BAD_REQUEST
+        )
+    # # If the username and email are available, proceed with user creation
     serializer = UserSerializer(data=request.data)
     
     if serializer.is_valid():
@@ -35,7 +57,22 @@ def signup(request):
                 admin_id=user
             )
 
-        return Response({"status": "success", "user_id": user.user_id, "role": user.role}, status=status.HTTP_201_CREATED)
+        # Start a session after successful signup
+        request.session['user_id'] = str(user.user_id)
+        request.session['role'] = user.role
+
+        # Prepare user profile data
+        user_profile = {
+            "user_id": user.user_id,
+            "username": user.username,
+            "email": user.email,
+            "role": user.role,
+            "password":user.password
+        }
+
+        return Response({"status": "success", "status": "success",
+                "message": "User created successfully",
+                "data": user_profile}, status=status.HTTP_201_CREATED)  # Include the user profile data 
     
     return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
@@ -85,17 +122,17 @@ def update_user(request):
 
 @api_view(['POST'])
 def login(request):
-    email = request.data.get('email')
+    username = request.data.get('username')  # Use username instead of email
     password = request.data.get('password')
     
-    if not email or not password:
+    if not username or not password:
         return Response(
             {"status": "error", "message": "Both email and password are required"},
             status=status.HTTP_400_BAD_REQUEST
         )
     
     try:
-        user = User.objects.get(email=email)
+        user = User.objects.get(username=username)  # Fetch user by username
     except User.DoesNotExist:
         return Response(
             {"status": "error", "message": "User does not exist, please sign up first"},
@@ -105,18 +142,170 @@ def login(request):
     # Compare passwords (plaintext comparison - not recommended for production)
     # In production, you should use check_password() with hashed passwords
     if user.password == password:
+        # Store user info in session
+        request.session['user_id'] = str(user.user_id)
+        request.session['role'] = user.role
+
+        # Prepare the user profile data to return
+        user_profile = {
+            "user_id": user.user_id,
+            "username": user.username,
+            "email": user.email,
+            "role": user.role,
+            "password":user.password
+        }
         return Response(
-            {"status": "success", "message": "Login successful", "user_id": user.user_id, "role": user.role},
+            {
+                "status": "success",
+                "message": "Login successful",
+                "data": user_profile  # Include the user profile data
+            },
             status=status.HTTP_200_OK
         )
+       
     else:
         return Response(
             {"status": "error", "message": "Incorrect password"},
             status=status.HTTP_401_UNAUTHORIZED
         )
+    
+
 @api_view(['POST'])
 def logout(request):
+    request.session.flush()  # Clears session data
     return Response(
         {"status": "success", "message": "Logged out successfully"},
         status=status.HTTP_200_OK
     )
+
+@api_view(['GET'])
+def getUserById(request, user_id):
+    try:
+        user = User.objects.get(user_id=user_id)
+        user_data = {
+            "user_id": user.user_id,
+            "username": user.username,
+            "email": user.email,
+            "role": user.role
+        }
+        
+        if user.role == 'student':
+            student_profile = Student.objects.get(student_id=user)
+            user_data.update({
+                "current_level": student_profile.current_level,
+                "total_points": student_profile.total_points
+            })
+        elif user.role == 'instructor':
+            user_data["instructor_profile"] = "Exists"
+        elif user.role == 'admin':
+            user_data["admin_profile"] = "Exists"
+        
+        return Response(user_data, status=status.HTTP_200_OK)
+    except User.DoesNotExist:
+        return Response({"status": "error", "message": "User not found"}, status=status.HTTP_404_NOT_FOUND)
+
+# get user's profile   
+@api_view(['GET'])
+def profile(request):
+    """Retrieve user details from session"""
+    user_id = request.session.get('user_id')
+
+    if not user_id:
+        return Response({"status": "error", "message": "User not logged in"}, status=status.HTTP_401_UNAUTHORIZED)
+
+    try:
+        user = User.objects.get(user_id=int(user_id))
+        user_data = {
+            "user_id": user.user_id,
+            "username": user.username,
+            "email": user.email,
+            "role": user.role,
+            "password":user.password
+        }
+
+        if user.role == 'student':
+            student_profile = Student.objects.get(student_id=user)
+            user_data.update({
+                "current_level": student_profile.current_level,
+                "total_points": student_profile.total_points
+            })
+        elif user.role == 'instructor':
+            user_data["instructor_profile"] = "Exists"
+        elif user.role == 'admin':
+            user_data["admin_profile"] = "Exists"
+
+        return Response(user_data, status=status.HTTP_200_OK)
+
+    except User.DoesNotExist:
+        return Response({"status": "error", "message": "User not found"}, status=status.HTTP_404_NOT_FOUND)
+
+
+@api_view(['PATCH'])
+def update_user_profile(request):
+    """Update user details (email and password only)"""
+    user_id = request.session.get('user_id')
+
+    if not user_id:
+        return Response({"status": "error", "message": "User not logged in"}, status=status.HTTP_401_UNAUTHORIZED)
+
+    try:
+        user = User.objects.get(user_id=int(user_id))
+    except User.DoesNotExist:
+        return Response({"status": "error", "message": "User not found"}, status=status.HTTP_404_NOT_FOUND)
+
+    email = request.data.get('email')
+    password = request.data.get('password')
+
+    # Update email (if provided)
+    if email:
+        if User.objects.filter(email=email).exclude(user_id=user.user_id).exists():
+            return Response({"status": "error", "message": "Email is already in use"}, status=status.HTTP_400_BAD_REQUEST)
+        user.email = email
+
+    # Update password (if provided and not empty)
+    if password is not None:  # Ensure password is not None
+        if password.strip() == "":  # Ensure password is not an empty string
+            return Response({"status": "error", "message": "Password cannot be empty"}, status=status.HTTP_400_BAD_REQUEST)
+        user.password = password 
+
+    user.save()
+    # Prepare the updated user profile to send in response
+    updated_profile = {
+        "user_id": user.user_id,
+        "username": user.username,
+        "email": user.email,
+        "role": user.role
+    }
+
+    return Response({"status": "success", "message": "User updated successfully", "data": updated_profile}, status=status.HTTP_200_OK)
+
+
+@api_view(['DELETE'])
+def deleteUser(request, user_id):
+    try:
+        # Get the user by user_id
+        user = User.objects.get(user_id=user_id)
+        
+        # Optionally, delete related profile objects (e.g., Student, Instructor, Admin)
+        if user.role == 'student':
+            student_profile = Student.objects.get(student_id=user)
+            student_profile.delete()
+        elif user.role == 'instructor':
+            instructor_profile = Instructor.objects.get(instructor_id=user)
+            instructor_profile.delete()
+        elif user.role == 'admin':
+            admin_profile = Admin.objects.get(admin_id=user)
+            admin_profile.delete()
+        
+        # Delete the user
+        user.delete()
+        
+        return Response(
+            {"status": "success", "message": "User deleted successfully"},
+            status=status.HTTP_200_OK
+        )
+    except User.DoesNotExist:
+        return Response(
+            {"status": "error", "message": "User not found"},
+            status=status.HTTP_404_NOT_FOUND
+        )
