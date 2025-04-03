@@ -2,12 +2,19 @@ import { Link, useNavigate } from "react-router-dom";
 import { useState, useEffect } from "react";
 import { useSelector, useDispatch } from "react-redux";
 import { setCurrentUser } from "./reducer";
+import * as client from "../APIs/usersAPI";
 
 export default function Profile() {
   const [profile, setProfile] = useState<any>({});
   const dispatch = useDispatch();
   const navigate = useNavigate();
   const { currentUser } = useSelector((state: any) => state.accountReducer);
+  const updateProfile = async () => {
+    const updatedProfile = await client.updateUser(profile);
+    dispatch(setCurrentUser(updatedProfile));
+    setEditMode(false); // Exit edit mode after updating
+  };
+
   const [editMode, setEditMode] = useState(false);
   const fetchProfile = () => {
     if (!currentUser) return navigate("QueryQuest/Signin");
@@ -73,7 +80,13 @@ export default function Profile() {
 
             <div className="d-flex gap-2">
               <button
-                onClick={() => setEditMode(!editMode)}
+                onClick={() => {
+                  if (editMode) {
+                    updateProfile(); // Save changes
+                  } else {
+                    setEditMode(true); // Enter edit mode
+                  }
+                }}
                 className="btn btn-primary w-50"
               >
                 {editMode ? "Save" : "Edit"}

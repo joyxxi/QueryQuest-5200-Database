@@ -3,17 +3,19 @@ import { Link, useNavigate } from "react-router-dom";
 import { setCurrentUser } from "./reducer";
 import { useDispatch } from "react-redux";
 import * as db from "../MockData";
+import * as client from "../APIs/usersAPI";
 
 export default function Signin() {
   const [credentials, setCredentials] = useState<any>({});
   const dispatch = useDispatch();
   const navigate = useNavigate();
-  const signin = () => {
-    const user = db.users.find(
-      (u: any) =>
-        u.username === credentials.username &&
-        u.password === credentials.password
-    );
+  const signin = async () => {
+    const user = await client.signin(credentials);
+    // const user = db.users.find(
+    //   (u: any) =>
+    //     u.username === credentials.username &&
+    //     u.password === credentials.password
+    // );
     if (!user) return;
     dispatch(setCurrentUser(user));
     navigate("/QueryQuest/Account");

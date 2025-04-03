@@ -8,30 +8,33 @@ import Signup from "./QueryQuest/Account/Signup";
 import store from "./QueryQuest/store";
 import { Provider } from "react-redux";
 import ProtectedRoute from "./QueryQuest/Account/ProtectedRoute";
+import Session from "./QueryQuest/Account/Session";
 function App() {
   return (
     <Provider store={store}>
-      <HashRouter>
-        <div>
-          <Routes>
-            <Route path="/" element={<Navigate to="/QueryQuest/Signin" />} />
-            {/* Standalone pages */}
-            <Route path="/QueryQuest/Signin" element={<Signin />} />
-            <Route path="/QueryQuest/Signup" element={<Signup />} />
+      <Session>
+        <HashRouter>
+          <div>
+            <Routes>
+              <Route path="/" element={<Navigate to="/QueryQuest/Signin" />} />
+              {/* Standalone pages */}
+              <Route path="/QueryQuest/Signin" element={<Signin />} />
+              <Route path="/QueryQuest/Signup" element={<Signup />} />
 
-            {/* Protected Pages */}
-            {/* Pages with Sidebar */}
-            <Route
-              path="/QueryQuest/*"
-              element={
-                <ProtectedRoute>
-                  <QueryQuest />
-                </ProtectedRoute>
-              }
-            />
-          </Routes>
-        </div>
-      </HashRouter>
+              {/* Protected Pages */}
+              {/* Pages with Sidebar */}
+              <Route
+                path="/QueryQuest/*"
+                element={
+                  <ProtectedRoute>
+                    <QueryQuest />
+                  </ProtectedRoute>
+                }
+              />
+            </Routes>
+          </div>
+        </HashRouter>
+      </Session>
     </Provider>
   );
 }

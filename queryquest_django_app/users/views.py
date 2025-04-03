@@ -8,6 +8,22 @@ from .serializers import UserSerializer
 
 @api_view(['POST'])
 def signup(request):
+    # Extract data from the request
+    username = request.data.get('username')
+    email = request.data.get('email')
+
+    # Check if user already exists with the same username or email
+    if User.objects.filter(username=username).exists():
+        return Response(
+            {"status": "error", "message": "Username is already taken"},
+            status=status.HTTP_400_BAD_REQUEST
+        )
+    if User.objects.filter(email=email).exists():
+        return Response(
+            {"status": "error", "message": "Email is already registered"},
+            status=status.HTTP_400_BAD_REQUEST
+        )
+    # If the username and email are available, proceed with user creation
     serializer = UserSerializer(data=request.data)
     
     if serializer.is_valid():
@@ -41,17 +57,17 @@ def signup(request):
 
 @api_view(['POST'])
 def login(request):
-    email = request.data.get('email')
+    username = request.data.get('username')  # Use username instead of email
     password = request.data.get('password')
     
-    if not email or not password:
+    if not username or not password:
         return Response(
             {"status": "error", "message": "Both email and password are required"},
             status=status.HTTP_400_BAD_REQUEST
         )
     
     try:
-        user = User.objects.get(email=email)
+        user = User.objects.get(username=username)  # Fetch user by username
     except User.DoesNotExist:
         return Response(
             {"status": "error", "message": "User does not exist, please sign up first"},
@@ -61,6 +77,7 @@ def login(request):
     # Compare passwords (plaintext comparison - not recommended for production)
     # In production, you should use check_password() with hashed passwords
     if user.password == password:
+        login(request, user)  # Create session
         return Response(
             {"status": "success", "message": "Login successful", "user_id": user.user_id, "role": user.role},
             status=status.HTTP_200_OK
@@ -76,3 +93,60 @@ def logout(request):
         {"status": "success", "message": "Logged out successfully"},
         status=status.HTTP_200_OK
     )
+
+@api_view(['GET'])
+def getUserById(request, user_id):
+    try:
+        user = User.objects.get(user_id=user_id)
+        user_data = {
+            "user_id": user.user_id,
+            "username": user.username,
+            "email": user.email,
+            "role": user.role
+        }
+        
+        if user.role == 'student':
+            student_profile = Student.objects.get(student_id=user)
+            user_data.update({
+                "current_level": student_profile.current_level,
+                "total_points": student_profile.total_points
+            })
+        elif user.role == 'instructor':
+            user_data["instructor_profile"] = "Exists"
+        elif user.role == 'admin':
+            user_data["admin_profile"] = "Exists"
+        
+        return Response(user_data, status=status.HTTP_200_OK)
+    except User.DoesNotExist:
+        return Response({"status": "error", "message": "User not found"}, status=status.HTTP_404_NOT_FOUND)
+
+
+@api_view(['DELETE'])
+def deleteUser(request, user_id):
+    try:
+        # Get the user by user_id
+        user = User.objects.get(user_id=user_id)
+        
+        # Optionally, delete related profile objects (e.g., Student, Instructor, Admin)
+        if user.role == 'student':
+            student_profile = Student.objects.get(student_id=user)
+            student_profile.delete()
+        elif user.role == 'instructor':
+            instructor_profile = Instructor.objects.get(instructor_id=user)
+            instructor_profile.delete()
+        elif user.role == 'admin':
+            admin_profile = Admin.objects.get(admin_id=user)
+            admin_profile.delete()
+        
+        # Delete the user
+        user.delete()
+        
+        return Response(
+            {"status": "success", "message": "User deleted successfully"},
+            status=status.HTTP_200_OK
+        )
+    except User.DoesNotExist:
+        return Response(
+            {"status": "error", "message": "User not found"},
+            status=status.HTTP_404_NOT_FOUND
+        )
