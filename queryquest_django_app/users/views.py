@@ -1,5 +1,4 @@
 from django.http import JsonResponse
-
 from rest_framework.decorators import api_view
 from rest_framework.response import Response
 from rest_framework import status
@@ -160,6 +159,36 @@ def profile(request):
         return Response({"status": "error", "message": "User not found"}, status=status.HTTP_404_NOT_FOUND)
 
 
+@api_view(['PATCH'])
+def update_user(request):
+    """Update user details (email and password only)"""
+    user_id = request.session.get('user_id')
+
+    if not user_id:
+        return Response({"status": "error", "message": "User not logged in"}, status=status.HTTP_401_UNAUTHORIZED)
+
+    try:
+        user = User.objects.get(user_id=int(user_id))
+    except User.DoesNotExist:
+        return Response({"status": "error", "message": "User not found"}, status=status.HTTP_404_NOT_FOUND)
+
+    email = request.data.get('email')
+    password = request.data.get('password')
+
+    # Update email (if provided)
+    if email:
+        if User.objects.filter(email=email).exclude(user_id=user.user_id).exists():
+            return Response({"status": "error", "message": "Email is already in use"}, status=status.HTTP_400_BAD_REQUEST)
+        user.email = email
+
+    # Update password (if provided and not empty)
+    if password is not None:  # Ensure password is not None
+        if password.strip() == "":  # Ensure password is not an empty string
+            return Response({"status": "error", "message": "Password cannot be empty"}, status=status.HTTP_400_BAD_REQUEST)
+        user.password = password 
+
+    user.save()
+    return Response({"status": "success", "message": "User updated successfully"}, status=status.HTTP_200_OK)
 
 @api_view(['DELETE'])
 def deleteUser(request, user_id):
