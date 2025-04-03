@@ -76,6 +76,7 @@ MIDDLEWARE = [
 
 ROOT_URLCONF = 'QueryQuest_Group4.urls'
 
+# session management
 SESSION_ENGINE = "django.contrib.sessions.backends.db"  # Store sessions in DB
 SESSION_COOKIE_AGE = 86400  # Session expires in 1 day
 SESSION_COOKIE_HTTPONLY = True  # Prevent JavaScript access (Security)
@@ -139,6 +140,7 @@ else:
 # https://docs.djangoproject.com/en/4.2/ref/settings/#auth-password-validators
 
 AUTH_PASSWORD_VALIDATORS = [
+    # Remove or comment out CommonPasswordValidator
     {
         'NAME': 'django.contrib.auth.password_validation.UserAttributeSimilarityValidator',
     },

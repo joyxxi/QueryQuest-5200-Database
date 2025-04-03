@@ -17,7 +17,9 @@ Including another URLconf
 from django.contrib import admin
 from django.urls import path, include
 from submissions import views
+
 from users.views import signup, login, logout, getUserById, profile, update_user_profile, deleteUser
+
 from usermessages.views import send_message, mark_as_read, select_all_users, all_messages
 
 urlpatterns = [
@@ -25,6 +27,7 @@ urlpatterns = [
     path('api/signup/', signup, name='signup'),  
     path('api/login/', login, name='login'), 
     path('api/logout/', logout, name='logout'),
+
     path('api/users/<int:user_id>/', getUserById, name='get_user_by_id'),
     path('api/users/profile/', profile, name='profile'),  # get user's profile
     path('api/users/profile/update/', update_user_profile, name='update_user'),

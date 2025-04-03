@@ -22,7 +22,6 @@ export const fetchProblemsWithProgress = async (
     const response = await axios.get<Problem[]>(
       `${BASE_URL}/problems/all_with_progress/${studentId}`
     );
-    console.log('Reponse Data:', response.data);
     return response.data;
   } catch (error) {
     console.error('Error fetching problems:', error);
