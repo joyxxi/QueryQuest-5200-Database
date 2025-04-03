@@ -1,3 +1,4 @@
+import { Update } from '@reduxjs/toolkit';
 import axios from 'axios';
 const BASE_URL = 'http://127.0.0.1:8000';
 
@@ -46,6 +47,18 @@ export interface CreateProblemRequest {
   choice3: string | null;
   correct_answer: number;
   created_by: number;
+}
+
+export interface UpdateProblemRequest {
+  unit?: number;
+  description?: string;
+  problem_type?: string;
+  difficulty?: string;
+  choice1?: string;
+  choice2?: string;
+  choice3?: string | null;
+  correct_answer?: number;
+  created_by?: number;
 }
 
 // Fetch all problems with progress for a specific student
@@ -99,6 +112,27 @@ export const createProblem = async (
       console.error('Error creating problem:', error.response.data);
     } else {
       console.error('Error creating problem:', error.message);
+    }
+    throw error;
+  }
+};
+
+export const updateProblem = async (
+  problemData: UpdateProblemRequest,
+  problem_id: number
+): Promise<InstructorAdminProblem> => {
+  try {
+    const reponse = await axios.put(
+      `${BASE_URL}/problems/${problem_id}/`,
+      problemData
+    );
+    console.log('Problem successfully updated: ', reponse.data);
+    return reponse.data;
+  } catch (error: any) {
+    if (error.response) {
+      console.error('Error updating problem:', error.response.data);
+    } else {
+      console.error('Error updating problem:', error.message);
     }
     throw error;
   }

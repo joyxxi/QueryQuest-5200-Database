@@ -9,6 +9,8 @@ import {
   Unit,
   createProblem,
   CreateProblemRequest,
+  UpdateProblemRequest,
+  updateProblem,
 } from '../APIs/problemAPI';
 import {
   Box,
@@ -143,9 +145,24 @@ const InstructorAdminProblemList = () => {
   const handleEditClick = (id: any) => {
     // Stub for edit functionality
     console.log('Edit clicked for ID:', id);
-    setSelectedProblemId(Number(id));
-    setOpenDialog(true);
-    // TODO: add edition logic
+    const problem = problems.find((p) => p.problem_id === id);
+    if (problem) {
+      setFormData({
+        unit: problem.unit.toString(),
+        description: problem.description,
+        problem_type: problem.problem_type,
+        difficulty: problem.difficulty,
+        choice1: problem.choice1,
+        choice2: problem.choice2,
+        choice3: problem.choice3 || '',
+        correct_answer: problem.correct_answer.toString(),
+        created_by: user_id,
+      });
+      setSelectedProblemId(Number(id));
+      setOpenDialog(true);
+    } else {
+      console.error('Problem not found with ID:', id);
+    }
   };
 
   const handleDeleteClick = (id: any) => {
@@ -209,21 +226,77 @@ const InstructorAdminProblemList = () => {
     if (!validateForm()) return;
     setIsLoading(true);
     try {
-      const problemData: CreateProblemRequest = {
-        unit: Number(formData.unit),
-        description: formData.description,
-        problem_type: formData.problem_type,
-        difficulty: formData.difficulty,
-        choice1: formData.choice1,
-        choice2: formData.choice2,
-        choice3: formData.choice3 || null,
-        correct_answer: Number(formData.correct_answer),
-        created_by: user_id,
-      };
-      console.log('Problem Data: ', problemData);
       if (selectedProblemId) {
         // TODO: logic for editing problem
+        const originalProblem = problems.find(
+          (p) => p.problem_id === selectedProblemId
+        );
+
+        if (!originalProblem) {
+          console.error('Original problem not found');
+          return;
+        }
+        const changedFields: Partial<UpdateProblemRequest> = {};
+        if (Number(formData.unit) !== originalProblem.unit)
+          changedFields.unit = Number(formData.unit);
+
+        if (formData.description !== originalProblem.description)
+          changedFields.description = formData.description;
+
+        if (formData.problem_type !== originalProblem.problem_type)
+          changedFields.problem_type = formData.problem_type;
+
+        if (formData.difficulty !== originalProblem.difficulty)
+          changedFields.difficulty = formData.difficulty;
+
+        if (formData.choice1 !== originalProblem.choice1)
+          changedFields.choice1 = formData.choice1;
+
+        if (formData.choice2 !== originalProblem.choice2)
+          changedFields.choice2 = formData.choice2;
+
+        const currentChoice3 = formData.choice3 || null;
+        if (currentChoice3 !== originalProblem.choice3)
+          changedFields.choice3 = currentChoice3;
+
+        if (Number(formData.correct_answer) !== originalProblem.correct_answer)
+          changedFields.correct_answer = Number(formData.correct_answer);
+
+        if (Object.keys(changedFields).length > 0) {
+          console.log(
+            'Updated Problem Data (changed fields only):',
+            changedFields
+          );
+          const response = await updateProblem(
+            changedFields,
+            selectedProblemId
+          );
+          console.log('Problem updated successfully');
+
+          setProblems((prevProblems) =>
+            prevProblems
+              .map((problem) =>
+                problem.problem_id === selectedProblemId ? response : problem
+              )
+              .sort((a, b) => a.unit - b.unit)
+          );
+          console.log('Problem updated successfully');
+        } else {
+          console.log('No changes detected, skipping udpate');
+        }
       } else {
+        const problemData: CreateProblemRequest = {
+          unit: Number(formData.unit),
+          description: formData.description,
+          problem_type: formData.problem_type,
+          difficulty: formData.difficulty,
+          choice1: formData.choice1,
+          choice2: formData.choice2,
+          choice3: formData.choice3 || null,
+          correct_answer: Number(formData.correct_answer),
+          created_by: user_id,
+        };
+        console.log('Problem Data: ', problemData);
         const response = await createProblem(problemData);
         console.log('Problem created successfully');
 
