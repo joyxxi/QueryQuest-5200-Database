@@ -3,8 +3,8 @@ from rest_framework import viewsets, permissions, status
 from rest_framework.response import Response
 from rest_framework.decorators import action
 from rest_framework.decorators import api_view
-from .models import Problem, Unit, Module
-from .serializers import ProblemSerializer, ProblemListSerializer
+from .models import Problem, Unit, User
+from .serializers import ProblemSerializer, ProblemListSerializer, UnitSerializer
 from users.models import Student
 from progress.models import Progress
 
@@ -26,6 +26,12 @@ class ProblemViewSet(viewsets.ModelViewSet):
     #     if self.action in ['create', 'update', 'partial_update', 'destroy']:
     #         return [IsInstructorOrAdmin()]
     #     return [permissions.IsAuthenticated()]
+
+    def list(self, request, *args, **kwargs):
+        """ Retreive all problems ordered by the unit they belong to. """
+        problems = Problem.objects.select_related('unit__module').order_by('unit__unit_id')
+        serializer = self.get_serializer(problems, many=True)
+        return Response(serializer.data, status=status.HTTP_200_OK)
     
     def retrieve(self, request, pk=None):
         """ Retrieve a single problem. """
@@ -35,8 +41,10 @@ class ProblemViewSet(viewsets.ModelViewSet):
     
     def create(self, request, *args, **kwargs):
         """ Create a new problem. """
-        data = request.data
+        data = request.data.copy()
         unit_id = data.get('unit')
+        print(data)
+
         # check if request is valid
         error = {}
         error.update(self.unit_exists_error(unit_id))
@@ -44,7 +52,17 @@ class ProblemViewSet(viewsets.ModelViewSet):
         if error:
             print("Validation Error: ", error)
             return Response(error, status=status.HTTP_400_BAD_REQUEST)
-        return super().create(request, *args, **kwargs)
+        try:
+            serializer = self.get_serializer(data=data)
+            if not serializer.is_valid():
+                print("Serializer errors:", serializer.errors)
+                return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+            self.perform_create(serializer)
+            return Response(serializer.data, status=status.HTTP_201_CREATED)
+        except Exception as e:
+            print(f"Error occurred: {e}")
+            return Response({"error": str(e)}, status=status.HTTP_400_BAD_REQUEST)
     
     def update(self, request, pk=None, *args, **kwargs):
         """ Update an existing problem. """
@@ -99,9 +117,9 @@ class ProblemViewSet(viewsets.ModelViewSet):
 
 @api_view(['GET'])
 def get_all_with_progress(request, student_id):
-    '''
+    """
     Fetch all problems with progress for a specific student order by unit.
-    '''
+    """
     try:
         student = get_object_or_404(Student, student_id=student_id)
     except Student.DoesNotExist:
@@ -123,3 +141,19 @@ def get_all_with_progress(request, student_id):
         problems_with_progress.append(problem)
 
     return Response(problems_with_progress, status=status.HTTP_200_OK)
+
+@api_view(['GET'])
+def get_units(request):
+    """ Fetch all units """
+    try:
+        units = Unit.objects.select_related('module').all().order_by('unit_id')
+
+        if not units.exists():
+            return Response({"error": "No units found."}, status=status.HTTP_404_NOT_FOUND)
+        
+        serializer = UnitSerializer(units, many=True)
+
+        return Response(serializer.data, status=status.HTTP_200_OK)
+    
+    except Exception as e:
+        return Response({"error": f"An unexpected error occurred: {str(e)}"}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
