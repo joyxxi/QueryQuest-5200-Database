@@ -2,7 +2,7 @@ import { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { setCurrentUser } from "./reducer";
 import { useDispatch } from "react-redux";
-import * as db from "../MockData";
+// import * as db from "../MockData";
 import * as client from "../APIs/usersAPI";
 
 export default function Signin() {
@@ -10,15 +10,14 @@ export default function Signin() {
   const dispatch = useDispatch();
   const navigate = useNavigate();
   const signin = async () => {
-    const user = await client.signin(credentials);
-    // const user = db.users.find(
-    //   (u: any) =>
-    //     u.username === credentials.username &&
-    //     u.password === credentials.password
-    // );
-    if (!user) return;
-    dispatch(setCurrentUser(user));
-    navigate("/QueryQuest/Account");
+    const response = await client.signin(credentials);
+    if (response.status === "success" && response.data) {
+      const user = response.data;
+      dispatch(setCurrentUser(user));
+      // console.log(credentials.username, credentials.password);
+      // console.log(user.user_id, user.username, user.password, user.email);
+      navigate("/QueryQuest/Account");
+    }
   };
 
   return (

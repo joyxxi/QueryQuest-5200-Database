@@ -1,29 +1,45 @@
 import axios from "axios";
 export const REMOTE_SERVER = process.env.REACT_APP_REMOTE_SERVER;
-export const USERS_API = `${REMOTE_SERVER}/api/users`;
 const axiosWithCredentials = axios.create({ withCredentials: true });
 
 export const signin = async (credentials: {
   username: string;
   password: string;
 }) => {
-  const response = await axiosWithCredentials.post(
-    `${REMOTE_SERVER}/api/login/`,
-    credentials
-  );
-  return response.data;
+  try {
+    const response = await axiosWithCredentials.post(
+      `${REMOTE_SERVER}/api/login/`,
+      credentials
+    );
+    return response.data; // Successful login
+  } catch (error: any) {
+    if (error.response) {
+      // Backend responded with an error status
+      throw new Error(
+        error.response.data.message || "Login failed. Please try again."
+      );
+    } else if (error.request) {
+      // No response from the server
+      throw new Error("Server is not responding. Please try again later.");
+    } else {
+      // Other unexpected errors
+      throw new Error("An unexpected error occurred. Please try again.");
+    }
+  }
 };
 
 export const signup = async (user: any) => {
   const response = await axiosWithCredentials.post(
-    `${REMOTE_SERVER}/api/signup`,
+    `${REMOTE_SERVER}/api/signup/`,
     user
   );
   return response.data;
 };
 
 export const profile = async () => {
-  const response = await axiosWithCredentials.get(`${REMOTE_SERVER}/profile`);
+  const response = await axiosWithCredentials.get(
+    `${REMOTE_SERVER}/api/users/profile/`
+  );
   return response.data;
 };
 
@@ -44,14 +60,9 @@ export const findUserById = async (user_id: number) => {
 //   return response.data;
 // };
 
-// export const createUser = async (user: any) => {
-//   const response = await axios.post(`${USERS_API}`, user);
-//   return response.data;
-// };
-
-export const updateUser = async (user: any) => {
-  const response = await axiosWithCredentials.put(
-    `${REMOTE_SERVER}/${user.user_id}`,
+export const updateUserProfile = async (user: any) => {
+  const response = await axiosWithCredentials.patch(
+    `${REMOTE_SERVER}/api/users/profile/update/`,
     user
   );
   return response.data;
@@ -63,6 +74,8 @@ export const deleteUser = async (userId: number) => {
   );
   return response.data;
 };
+
+// get all problems
 
 // get all progress for a user
 

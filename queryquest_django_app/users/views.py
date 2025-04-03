@@ -10,7 +10,14 @@ def signup(request):
     # Extract data from the request
     username = request.data.get('username')
     email = request.data.get('email')
+    password = request.data.get('password')
+    role = request.data.get('role', 'admin')
 
+    if not username or not email or not password:
+            return Response(
+                {"status": "error", "message": "All fields are required"},
+                status=status.HTTP_400_BAD_REQUEST
+            )
     # Check if user already exists with the same username or email
     if User.objects.filter(username=username).exists():
         return Response(
@@ -22,7 +29,7 @@ def signup(request):
             {"status": "error", "message": "Email is already registered"},
             status=status.HTTP_400_BAD_REQUEST
         )
-    # If the username and email are available, proceed with user creation
+    # # If the username and email are available, proceed with user creation
     serializer = UserSerializer(data=request.data)
     
     if serializer.is_valid():
@@ -49,11 +56,23 @@ def signup(request):
             Admin.objects.create(
                 admin_id=user
             )
+
         # Start a session after successful signup
         request.session['user_id'] = str(user.user_id)
         request.session['role'] = user.role
 
-        return Response({"status": "success", "user_id": user.user_id, "role": user.role}, status=status.HTTP_201_CREATED)
+        # Prepare user profile data
+        user_profile = {
+            "user_id": user.user_id,
+            "username": user.username,
+            "email": user.email,
+            "role": user.role,
+            "password":user.password
+        }
+
+        return Response({"status": "success", "status": "success",
+                "message": "User created successfully",
+                "data": user_profile}, status=status.HTTP_201_CREATED)  # Include the user profile data 
     
     return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
@@ -82,15 +101,31 @@ def login(request):
         # Store user info in session
         request.session['user_id'] = str(user.user_id)
         request.session['role'] = user.role
+
+        # Prepare the user profile data to return
+        user_profile = {
+            "user_id": user.user_id,
+            "username": user.username,
+            "email": user.email,
+            "role": user.role,
+            "password":user.password
+        }
         return Response(
-            {"status": "success", "message": "Login successful", "user_id": user.user_id, "role": user.role},
+            {
+                "status": "success",
+                "message": "Login successful",
+                "data": user_profile  # Include the user profile data
+            },
             status=status.HTTP_200_OK
         )
+       
     else:
         return Response(
             {"status": "error", "message": "Incorrect password"},
             status=status.HTTP_401_UNAUTHORIZED
         )
+    
+
 @api_view(['POST'])
 def logout(request):
     request.session.flush()  # Clears session data
@@ -124,7 +159,8 @@ def getUserById(request, user_id):
         return Response(user_data, status=status.HTTP_200_OK)
     except User.DoesNotExist:
         return Response({"status": "error", "message": "User not found"}, status=status.HTTP_404_NOT_FOUND)
-    
+
+# get user's profile   
 @api_view(['GET'])
 def profile(request):
     """Retrieve user details from session"""
@@ -139,7 +175,8 @@ def profile(request):
             "user_id": user.user_id,
             "username": user.username,
             "email": user.email,
-            "role": user.role
+            "role": user.role,
+            "password":user.password
         }
 
         if user.role == 'student':
@@ -160,7 +197,7 @@ def profile(request):
 
 
 @api_view(['PATCH'])
-def update_user(request):
+def update_user_profile(request):
     """Update user details (email and password only)"""
     user_id = request.session.get('user_id')
 
@@ -188,7 +225,16 @@ def update_user(request):
         user.password = password 
 
     user.save()
-    return Response({"status": "success", "message": "User updated successfully"}, status=status.HTTP_200_OK)
+    # Prepare the updated user profile to send in response
+    updated_profile = {
+        "user_id": user.user_id,
+        "username": user.username,
+        "email": user.email,
+        "role": user.role
+    }
+
+    return Response({"status": "success", "message": "User updated successfully", "data": updated_profile}, status=status.HTTP_200_OK)
+
 
 @api_view(['DELETE'])
 def deleteUser(request, user_id):

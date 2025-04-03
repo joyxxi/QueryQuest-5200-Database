@@ -5,13 +5,33 @@ import { useDispatch } from "react-redux";
 import { setCurrentUser } from "./reducer";
 
 export default function Signup() {
-  const [user, setUser] = useState<any>({});
+  const [user, setUser] = useState<any>({
+    username: "",
+    email: "",
+    password: "",
+    role: "admin", // Default role set to 'admin'
+  });
   const navigate = useNavigate();
   const dispatch = useDispatch();
   const signup = async () => {
-    const currentUser = await client.signup(user);
-    dispatch(setCurrentUser(currentUser));
-    navigate("/QueryQuest/Account");
+    try {
+      // const currentUser = await client.signup(user);
+      const response = await client.signup(user);
+      console.log(response);
+      if (response.status === "success" && response.data) {
+        const currentUser = response.data;
+        console.log("Signup Successful:", currentUser);
+        dispatch(setCurrentUser(currentUser));
+        navigate("/QueryQuest/Account");
+      }
+    } catch (error: any) {
+      if (error.response) {
+        // Log the full response for more insights
+        console.error("Signup failed:", error.response.data);
+      } else {
+        console.error("Signup failed:", error.message);
+      }
+    }
   };
 
   return (
