@@ -40,7 +40,9 @@ const StudentProblemList = (student_id: any) => {
 
   useEffect(() => {
     const loadProblems = async () => {
-      const problemsData = await fetchProblemsWithProgress(student_id);
+      const problemsData = await fetchProblemsWithProgress(
+        student_id.student_id
+      );
       setProblems(problemsData);
     };
 
