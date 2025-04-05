@@ -22,30 +22,32 @@ interface UsersResponse {
 }
 
 // Fetch all messages
-export const fetchMessages = async (): Promise<ApiResponse> => {
+export const fetchMessages = async (username: string): Promise<ApiResponse> => {
   try {
-    const response = await fetch('http://127.0.0.1:8000/api/allmessages/');
+    const response = await fetch(
+      `http://127.0.0.1:8000/api/allmessages/${username}/`
+    );
     if (!response.ok) {
-      throw new Error('Network response was not ok');
+      throw new Error("Network response was not ok");
     }
     return await response.json();
   } catch (error) {
-    console.error('Error fetching messages:', error);
-    return { status: 'error', messages: [] };
+    console.error("Error fetching messages:", error);
+    return { status: "error", messages: [] };
   }
 };
 
 // Fetch all users
 export const fetchUsers = async (): Promise<User[]> => {
   try {
-    const response = await fetch('http://127.0.0.1:8000/api/allusers/');
+    const response = await fetch("http://127.0.0.1:8000/api/allusers/");
     const data: UsersResponse = await response.json();
-    if (data.status === 'success') {
+    if (data.status === "success") {
       return data.users.map((username) => ({ username }));
     }
     return [];
   } catch (error) {
-    console.error('Error fetching users:', error);
+    console.error("Error fetching users:", error);
     return [];
   }
 };
@@ -58,15 +60,15 @@ export const markMessageAsRead = async (
     const response = await fetch(
       `http://127.0.0.1:8000/api/mark_as_read/${messageId}/`,
       {
-        method: 'POST',
+        method: "POST",
         headers: {
-          'Content-Type': 'application/json',
+          "Content-Type": "application/json",
         },
       }
     );
     return response.ok;
   } catch (error) {
-    console.error('Error marking message as read:', error);
+    console.error("Error marking message as read:", error);
     return false;
   }
 };
@@ -77,10 +79,10 @@ export const sendMessage = async (
   content: string
 ): Promise<boolean> => {
   try {
-    const response = await fetch('http://127.0.0.1:8000/api/allmessages/', {
-      method: 'POST',
+    const response = await fetch("http://127.0.0.1:8000/api/allmessages/", {
+      method: "POST",
       headers: {
-        'Content-Type': 'application/json',
+        "Content-Type": "application/json",
       },
       body: JSON.stringify({
         receiver_username: receiver,
@@ -89,7 +91,7 @@ export const sendMessage = async (
     });
     return response.ok;
   } catch (error) {
-    console.error('Error sending message:', error);
+    console.error("Error sending message:", error);
     return false;
   }
 };

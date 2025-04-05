@@ -109,9 +109,9 @@ def select_all_users(request):
 #         }, status=500)
     
 @api_view(['GET'])
-def all_messages(request):
+def all_messages(request, username):
     try:
-        current_username = request.data.get('username')  # Get current user's username
+        # current_username = request.data.get('username')  # Get current user's username
         with connection.cursor() as cursor:
             # Query to get messages where user is either sender or receiver
             query = """
@@ -133,7 +133,8 @@ def all_messages(request):
             ORDER BY 
                 m.created_at DESC
             """
-            cursor.execute(query, [current_username, current_username])
+            # cursor.execute(query, [current_username, current_username])
+            cursor.execute(query, [username, username])
             columns = [col[0] for col in cursor.description]
             messages = [dict(zip(columns, row)) for row in cursor.fetchall()]
             
