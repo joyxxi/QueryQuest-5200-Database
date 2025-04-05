@@ -32,19 +32,6 @@ CREATE TABLE Admins (
     FOREIGN KEY (admin_id) REFERENCES Users(user_id) ON DELETE CASCADE
 );
 
--- Create Messages Table
-DROP TABLE IF EXISTS Messages;
-CREATE TABLE Messages (
-    message_id INT AUTO_INCREMENT,
-    sender_id INT NOT NULL,
-    receiver_id INT NOT NULL,
-    m_content TEXT,
-    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    PRIMARY KEY (message_id),
-    FOREIGN KEY (sender_id) REFERENCES Users(user_id),
-    FOREIGN KEY (receiver_id) REFERENCES Users(user_id)
-);
-
 -- Inserting Users
 INSERT INTO Users (user_id, role, username, email, password, created_at) VALUES
 (1, 'student', 'testuser', 'test@example.com', 'test123', '2025-03-25 21:09:26'),
@@ -76,10 +63,3 @@ INSERT INTO Instructors (instructor_id) VALUES
 INSERT INTO Admins (admin_id) VALUES
 (9),
 (10);
-
--- Inserting Messages
-INSERT INTO Messages (message_id, sender_id, receiver_id, m_content, created_at) VALUES
-(1, 1, 6, 'Hello there!', '2025-03-26 00:02:34'),
-(2, 1, 6, 'Hello there!', '2025-03-26 00:15:01'),
-(3, 1, 7, 'Hello 2!', '2025-03-26 00:16:19'),
-(4, 1, 7, 'Hello 2!', '2025-03-26 04:24:38');
