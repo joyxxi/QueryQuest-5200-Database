@@ -13,6 +13,11 @@ import {
 export default function Message() {
   // fetch current user
   const { currentUser } = useSelector((state: any) => state.accountReducer);
+  console.log(
+    currentUser.user_id,
+    currentUser.role,
+    typeof currentUser.user_id
+  );
 
   const [apiResponse, setApiResponse] = useState<ApiResponse>({
     status: "",
@@ -30,7 +35,7 @@ export default function Message() {
   // Fetch messages from backend
   useEffect(() => {
     const loadMessages = async () => {
-      const data = await fetchMessages();
+      const data = await fetchMessages(currentUser.username);
       setApiResponse(data);
     };
     loadMessages();
@@ -65,7 +70,7 @@ export default function Message() {
   const handleSendMessage = async () => {
     const success = await sendMessage(newMessage.receiver, newMessage.content);
     if (success) {
-      const updatedData = await fetchMessages();
+      const updatedData = await fetchMessages(currentUser.user_id);
       setApiResponse(updatedData);
       setShowPopup(false);
       setNewMessage({ receiver: "", content: "" });

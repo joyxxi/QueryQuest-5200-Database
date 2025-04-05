@@ -36,7 +36,7 @@ urlpatterns = [
     path('api/send_message/', send_message, name='send-message'),
     path('api/mark_as_read/<int:message_id>/', mark_as_read, name='mark_as_read'),
     path('api/allusers/', select_all_users, name='select_all_users'),
-    path('api/allmessages/', all_messages, name='all_messages'),
+    path('api/allmessages/<str:username>/', all_messages, name='all_messages'),
 
     # Path to problems app
     path('problems/', include('problems.urls')),
