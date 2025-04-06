@@ -108,6 +108,23 @@ export default function Chatbot() {
     }
   };
 
+    // Handle clicking a prompt
+    const handlePromptClick = (description: string) => {
+      // Add the clicked prompt as a user message
+      console.log("Selected prompt:", description);
+      setChatHistory((prev) => [
+        ...prev,
+        {
+          id: Date.now().toString(),
+          content: description,
+          sender: 'user',
+        },
+      ]);
+      setLoading(true); // Simulate sending
+      messageApi.info('Sending message...');
+    };
+  
+
   return (
     <div id="wd-chatbot-screen" style={{ padding: '24px', maxWidth: '800px', margin: '0 auto' }}>
       {contextHolder}
@@ -160,7 +177,8 @@ export default function Chatbot() {
                 <Prompts 
                   title={role === 'student' ? "Common Student Questions" : "Common Instructor Questions"} 
                   items={role === 'student' ? studentItems : instructorItems} 
-                  vertical 
+                  vertical
+                  onItemClick={(item) => handlePromptClick(item.data.description as string)} // Add click handler
                 />
               }
             />
