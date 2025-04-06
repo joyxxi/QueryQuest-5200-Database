@@ -13,11 +13,6 @@ import {
 export default function Message() {
   // fetch current user
   const { currentUser } = useSelector((state: any) => state.accountReducer);
-  console.log(
-    currentUser.user_id,
-    currentUser.role,
-    typeof currentUser.user_id
-  );
 
   const [apiResponse, setApiResponse] = useState<ApiResponse>({
     status: "",
@@ -28,6 +23,7 @@ export default function Message() {
   const [newMessage, setNewMessage] = useState({
     receiver: "",
     content: "",
+    sender: currentUser.username,
   });
   const [users, setUsers] = useState<User[]>([]);
   const [loadingUsers, setLoadingUsers] = useState(false);
@@ -68,12 +64,27 @@ export default function Message() {
   };
 
   const handleSendMessage = async () => {
-    const success = await sendMessage(newMessage.receiver, newMessage.content);
+    if (!newMessage.receiver || !newMessage.content.trim()) {
+      alert("Please select a receiver and type a message.");
+      return;
+    }
+    const success = await sendMessage(
+      newMessage.receiver,
+      newMessage.content,
+      newMessage.sender
+    );
+    console.log("Send success:", success);
     if (success) {
-      const updatedData = await fetchMessages(currentUser.user_id);
+      const updatedData = await fetchMessages(currentUser.username);
       setApiResponse(updatedData);
       setShowPopup(false);
-      setNewMessage({ receiver: "", content: "" });
+      setNewMessage({
+        receiver: "",
+        content: "",
+        sender: currentUser.username,
+      });
+    } else {
+      alert("Failed to send message. Please try again.");
     }
   };
 
@@ -139,7 +150,9 @@ export default function Message() {
                     borderTop: "1px solid #ddd",
                     cursor: "pointer",
                     backgroundColor:
-                      message === selectedMessage ? "#f0f7ff" : "white",
+                      message.message_id === selectedMessage?.message_id
+                        ? "#f0f7ff"
+                        : "white",
                   }}
                 >
                   <td style={{ padding: "12px" }}>

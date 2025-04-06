@@ -76,10 +76,11 @@ export const markMessageAsRead = async (
 // Send new message
 export const sendMessage = async (
   receiver: string,
-  content: string
+  content: string,
+  sender: string
 ): Promise<boolean> => {
   try {
-    const response = await fetch("http://127.0.0.1:8000/api/allmessages/", {
+    const response = await fetch("http://127.0.0.1:8000/api/send_message/", {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
@@ -87,6 +88,7 @@ export const sendMessage = async (
       body: JSON.stringify({
         receiver_username: receiver,
         m_content: content,
+        sender_username: sender,
       }),
     });
     return response.ok;

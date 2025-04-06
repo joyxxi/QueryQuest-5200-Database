@@ -31,7 +31,7 @@ def send_message(request):
     )
     
     return Response(
-        {"status": "success", "message_id": message.id},
+        {"status": "success", "message_id": message.message_id},
         status=status.HTTP_201_CREATED
     )
 
