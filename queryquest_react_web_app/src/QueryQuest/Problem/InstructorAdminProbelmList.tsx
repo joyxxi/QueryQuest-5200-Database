@@ -374,7 +374,7 @@ const InstructorAdminProblemList = () => {
             if ((event.target as HTMLElement).closest('.MuiButtonBase-root')) {
               return;
             }
-            navigate(`/QueryQuest/Problem/${params.id}`);
+            // navigate(`/QueryQuest/Problem/${params.id}`);
           }}
         />
       </Box>
