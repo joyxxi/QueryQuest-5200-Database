@@ -9,7 +9,7 @@ const StudentProblemList = (student_id: any) => {
   const colors = tokens;
   const navigate = useNavigate();
   const columns: GridColDef[] = [
-    { field: 'module_title', headerName: 'Module', minWidth: 150, flex: 1 },
+    { field: 'module_title', headerName: 'Module', minWidth: 150, flex: 0.8 },
     {
       field: 'unit_id',
       headerName: 'Unit ID',
@@ -19,13 +19,14 @@ const StudentProblemList = (student_id: any) => {
       flex: 0.4,
     },
     { field: 'unit_title', headerName: 'Unit', minWidth: 150, flex: 1 },
-    // {
-    //   field: 'problem_id',
-    //   headerName: 'Problem ID',
-    //   type: 'number',
-    //   headerAlign: 'left',
-    //   align: 'left',
-    // },
+    {
+      field: 'problem_id',
+      headerName: 'Problem ID',
+      type: 'number',
+      headerAlign: 'left',
+      align: 'left',
+      flex: 0.4,
+    },
     {
       field: 'description',
       headerName: 'Problem',

@@ -64,16 +64,24 @@ const InstructorAdminProblemList = () => {
   const [formErrors, setFormErrors] = useState<{ [key: string]: string }>({});
 
   const columns: GridColDef[] = [
-    { field: 'module_title', headerName: 'Module', minWidth: 150, flex: 1 },
+    { field: 'module_title', headerName: 'Module', minWidth: 150, flex: 0.8 },
     {
       field: 'unit',
       headerName: 'Unit ID',
       type: 'number',
       headerAlign: 'left',
       align: 'left',
-      flex: 0.4,
+      flex: 0.3,
     },
     { field: 'unit_title', headerName: 'Unit', minWidth: 150, flex: 1 },
+    {
+      field: 'problem_id',
+      headerName: 'Problem ID',
+      type: 'number',
+      headerAlign: 'left',
+      align: 'left',
+      flex: 0.4,
+    },
     {
       field: 'description',
       headerName: 'Problem',
