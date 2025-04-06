@@ -11,6 +11,7 @@ import {
   CreateProblemRequest,
   UpdateProblemRequest,
   updateProblem,
+  deleteProblem,
 } from '../APIs/problemAPI';
 import {
   Box,
@@ -174,18 +175,31 @@ const InstructorAdminProblemList = () => {
   };
 
   const handleDeleteClick = (id: any) => {
-    // Stub for delete functionality
     console.log('Delete clicked for ID:', id);
     setSelectedProblemId(Number(id));
     setDeleteConfirmDialog(true);
-    // TODO: add deletion logic
   };
 
-  const handleDeleteConfirm = () => {
+  const handleDeleteConfirm = async () => {
+    if (!selectedProblemId) return;
     // Stub for delete confirmation
-    console.log('Confirm delete for ID:', selectedProblemId);
-    setDeleteConfirmDialog(false);
-    // TODO: add deletion logic
+
+    setIsLoading(true);
+    try {
+      console.log('Confirm delete for ID:', selectedProblemId);
+      await deleteProblem(selectedProblemId);
+      setProblems((prevProblems) =>
+        prevProblems.filter(
+          (problem) => problem.problem_id !== selectedProblemId
+        )
+      );
+    } catch (error) {
+      console.error('Error deleting problem:', error);
+    } finally {
+      setIsLoading(false);
+      setSelectedProblemId(null);
+      setDeleteConfirmDialog(false);
+    }
   };
 
   // Fixed type for text input changes
@@ -369,6 +383,7 @@ const InstructorAdminProblemList = () => {
           columns={columns}
           getRowId={(row) => row.problem_id}
           pageSizeOptions={[8, 16, 32]}
+          loading={isLoading}
           onRowClick={(params, event) => {
             // Prevent row click when clicking on action buttons
             if ((event.target as HTMLElement).closest('.MuiButtonBase-root')) {
@@ -382,7 +397,7 @@ const InstructorAdminProblemList = () => {
       {/* Add/Edit Problem Dialog */}
       <Dialog
         open={openDialog}
-        onClose={handleCloseDialog}
+        onClose={() => !isLoading && handleCloseDialog()}
         maxWidth="md"
         fullWidth
       >
@@ -429,6 +444,7 @@ const InstructorAdminProblemList = () => {
                 value={formData.difficulty}
                 label="Difficulty"
                 onChange={handleSelectChange}
+                disabled={isLoading}
               >
                 <MenuItem value="Easy">Easy</MenuItem>
                 <MenuItem value="Medium">Medium</MenuItem>
@@ -530,9 +546,16 @@ const InstructorAdminProblemList = () => {
           </Box>
         </DialogContent>
         <DialogActions>
-          <Button onClick={handleCloseDialog}>Cancel</Button>
-          <Button onClick={handleSubmit} variant="contained" color="primary">
-            {selectedProblemId ? 'Update' : 'Create'}
+          <Button onClick={handleCloseDialog} disabled={isLoading}>
+            Cancel
+          </Button>
+          <Button
+            onClick={handleSubmit}
+            variant="contained"
+            color="primary"
+            disabled={isLoading}
+          >
+            {isLoading ? 'Saving...' : selectedProblemId ? 'Update' : 'Create'}
           </Button>
         </DialogActions>
       </Dialog>
@@ -553,8 +576,9 @@ const InstructorAdminProblemList = () => {
             onClick={handleDeleteConfirm}
             variant="contained"
             color="error"
+            disabled={isLoading}
           >
-            Delete
+            {isLoading ? 'Deleting...' : 'Delete'}
           </Button>
         </DialogActions>
       </Dialog>

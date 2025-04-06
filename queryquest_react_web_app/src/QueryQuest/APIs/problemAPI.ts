@@ -89,6 +89,7 @@ export const fetchProblems = async (): Promise<InstructorAdminProblem[]> => {
   }
 };
 
+// Fetch all units
 export const fetchUnits = async (): Promise<Unit[]> => {
   try {
     const response = await axios.get<Unit[]>(`${BASE_URL}/problems/units`);
@@ -100,6 +101,7 @@ export const fetchUnits = async (): Promise<Unit[]> => {
   }
 };
 
+// Create a new problem
 export const createProblem = async (
   problemData: CreateProblemRequest
 ): Promise<InstructorAdminProblem> => {
@@ -117,6 +119,7 @@ export const createProblem = async (
   }
 };
 
+// Update an existing problem
 export const updateProblem = async (
   problemData: UpdateProblemRequest,
   problem_id: number
@@ -138,4 +141,17 @@ export const updateProblem = async (
   }
 };
 
-export const deleteProblem = async () => {};
+// Delete a problem
+export const deleteProblem = async (problem_id: number): Promise<void> => {
+  try {
+    await axios.delete(`${BASE_URL}/problems/${problem_id}`);
+    console.log('Problem successfully deleted');
+  } catch (error: any) {
+    if (error.response) {
+      console.error('Error deleting problem:', error.response.data);
+    } else {
+      console.error('Error deleting problem:', error.message);
+    }
+    throw error;
+  }
+};
