@@ -1,6 +1,5 @@
 import { DataGrid, GridColDef, GridActionsCellItem } from '@mui/x-data-grid';
 import { tokens } from '../../theme';
-import { useNavigate } from 'react-router-dom';
 import { useEffect, useState } from 'react';
 import {
   fetchProblems,
@@ -36,7 +35,6 @@ import { useSelector } from 'react-redux';
 
 const InstructorAdminProblemList = () => {
   const colors = tokens;
-  const navigate = useNavigate();
 
   const [problems, setProblems] = useState<InstructorAdminProblem[]>([]);
   const [openDialog, setOpenDialog] = useState(false);

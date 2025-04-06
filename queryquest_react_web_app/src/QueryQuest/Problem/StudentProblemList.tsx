@@ -4,6 +4,7 @@ import { useNavigate } from 'react-router-dom';
 import { useEffect, useState } from 'react';
 import { fetchProblemsWithProgress, StudentProblem } from '../APIs/problemAPI';
 import { Box, Typography } from '@mui/material';
+import DoneIcon from '@mui/icons-material/Done';
 
 const StudentProblemList = (student_id: any) => {
   const colors = tokens;
@@ -37,7 +38,18 @@ const StudentProblemList = (student_id: any) => {
       flex: 1,
     },
     { field: 'difficulty', headerName: 'Difficulty' },
-    { field: 'status', headerName: 'Status' }, // TODO: change according to progress later
+    {
+      field: 'status',
+      headerName: 'Status',
+      width: 100,
+      renderCell: (params) => {
+        return params.value === 'Complete' ? (
+          <DoneIcon color="success" />
+        ) : (
+          <></>
+        );
+      },
+    },
   ];
 
   useEffect(() => {
