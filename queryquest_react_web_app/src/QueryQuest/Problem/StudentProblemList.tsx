@@ -8,6 +8,9 @@ import { Box, Typography } from '@mui/material';
 const StudentProblemList = (student_id: any) => {
   const colors = tokens;
   const navigate = useNavigate();
+  const [problems, setProblems] = useState<StudentProblem[]>([]);
+  const [isLoading, setIsLoading] = useState(false);
+
   const columns: GridColDef[] = [
     { field: 'module_title', headerName: 'Module', minWidth: 150, flex: 0.8 },
     {
@@ -37,14 +40,14 @@ const StudentProblemList = (student_id: any) => {
     { field: 'status', headerName: 'Status' }, // TODO: change according to progress later
   ];
 
-  const [problems, setProblems] = useState<StudentProblem[]>([]);
-
   useEffect(() => {
     const loadProblems = async () => {
+      setIsLoading(true);
       const problemsData = await fetchProblemsWithProgress(
         student_id.student_id
       );
       setProblems(problemsData);
+      setIsLoading(false);
     };
 
     loadProblems();
@@ -87,6 +90,7 @@ const StudentProblemList = (student_id: any) => {
           columns={columns}
           getRowId={(row) => row.problem_id}
           pageSizeOptions={[8, 16, 32]}
+          loading={isLoading}
           onRowClick={(params) => navigate(`/QueryQuest/Problem/${params.id}`)}
         />
       </Box>
