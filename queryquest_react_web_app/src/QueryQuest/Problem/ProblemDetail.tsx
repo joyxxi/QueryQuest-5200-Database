@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { useParams } from 'react-router-dom'; // 导入 useParams 钩子
+import { useParams, useNavigate } from 'react-router-dom'; // 导入 useParams 和 useNavigate 钩子
 import './ProblemDetail.css'; // 导入样式文件
 import { useSelector } from 'react-redux';
 import { Feedback, fetchFeedback, refreshFeedback } from '../APIs/feedbackAPI';
@@ -29,6 +29,8 @@ const ProblemDetail: React.FC = () => {
   const [loading, setLoading] = useState<boolean>(false);
 
   const student_id = currentUser?.user_id;
+
+  const navigate = useNavigate(); // 使用 useNavigate 钩子
 
   useEffect(() => {
     if (isNaN(numericPid)) return;
@@ -133,6 +135,10 @@ const ProblemDetail: React.FC = () => {
       setLoading(false);
     }
     setShowFeedback(true);
+  };
+
+  const handleGoBack = () => {
+    navigate('/QueryQuest/Problem'); // 使用 navigate() 导航回问题列表页面
   };
 
   if (!problem) {
@@ -254,6 +260,11 @@ const ProblemDetail: React.FC = () => {
         </div>
       )}
       {errorMessage && <p style={{ color: 'red' }}>{errorMessage}</p>}
+
+      {/* Go Back Button */}
+      <button className="go-back-btn" onClick={handleGoBack}>
+        Go Back
+      </button>
     </div>
   );
 };

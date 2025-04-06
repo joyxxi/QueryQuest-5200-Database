@@ -44,9 +44,8 @@ class SubmissionViewSet(viewsets.ModelViewSet):
                     progress.save()
                     
                     # Increment student's total_points only if this is the first time completing this problem
-                    student = submission.student.student_profile
-                    student.total_points += 1
-                    student.save()
+                    submission.student.total_points += 1
+                    submission.student.save()
                 
             except Progress.DoesNotExist:
                 # If no progress entry exists, create one
@@ -103,5 +102,3 @@ class SubmissionViewSet(viewsets.ModelViewSet):
         # 返回符合条件的提交记录
         submissions_data = self.get_serializer(submissions, many=True).data
         return Response(submissions_data)
-
-
