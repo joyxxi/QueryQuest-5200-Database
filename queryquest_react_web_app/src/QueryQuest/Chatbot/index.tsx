@@ -1,43 +1,61 @@
-import React, { useState } from 'react';
-import { CoffeeOutlined, FireOutlined, SmileOutlined, UserOutlined, TeamOutlined, TrophyOutlined, BookOutlined } from '@ant-design/icons';
-import { Bubble, Prompts, PromptsProps, Sender } from '@ant-design/x';
-import { App, Flex, Radio, RadioChangeEvent, Typography, message, Card } from 'antd';
+import React, { useEffect, useState } from "react";
+import { useSelector } from "react-redux";
+import {
+  CoffeeOutlined,
+  FireOutlined,
+  SmileOutlined,
+  UserOutlined,
+  TeamOutlined,
+  TrophyOutlined,
+  BookOutlined,
+  BarChartOutlined,
+} from "@ant-design/icons";
+import { Bubble, Prompts, PromptsProps, Sender } from "@ant-design/x";
+import {
+  App,
+  Flex,
+  Radio,
+  RadioChangeEvent,
+  Typography,
+  message,
+  Card,
+} from "antd";
 
 const { Title, Text } = Typography;
 
 const studentItems = [
   {
-    key: '1',
-    icon: <CoffeeOutlined style={{ color: '#964B00' }} />,
-    description: 'Current total points',
+    key: "1",
+    icon: <CoffeeOutlined style={{ color: "#964B00" }} />,
+    description: "My current total points",
   },
   {
-    key: '2',
-    icon: <SmileOutlined style={{ color: '#FAAD14' }} />,
-    description: 'Current rank',
+    key: "2",
+    icon: <SmileOutlined style={{ color: "#FAAD14" }} />,
+    description: "My current rank",
   },
   {
-    key: '3',
-    icon: <FireOutlined style={{ color: '#FF4D4F' }} />,
-    description: 'Questions answered incorrectly before',
+    key: "3",
+    icon: <FireOutlined style={{ color: "#FF4D4F" }} />,
+    description: "Questions I've answered incorrectly before",
   },
 ];
 
 const instructorItems = [
   {
-    key: '4',
-    icon: <TrophyOutlined style={{ color: '#FFD700' }} />,
-    description: 'Names of the top 5 highest scorers',
+    key: "4",
+    icon: <TrophyOutlined style={{ color: "#FFD700" }} />,
+    description: "Names of the top 5 highest scorers",
   },
   {
-    key: '5',
-    icon: <TeamOutlined style={{ color: '#1890FF' }} />,
-    description: 'Current number of students',
+    key: "5",
+    icon: <TeamOutlined style={{ color: "#1890FF" }} />,
+    description: "Current number of students",
   },
   {
-    key: '6',
-    icon: <BookOutlined style={{ color: '#52C41A' }} />,
-    description: 'Current number of questions',
+    key: "6",
+    icon: <BookOutlined style={{ color: "#52C41A" }} />,
+    description: "Current number of questions",
   },
 ];
 
@@ -45,29 +63,39 @@ const instructorItems = [
 type ChatMessage = {
   id: string;
   content: string;
-  sender: 'user' | 'bot';
+  sender: "user" | "bot";
 };
 
 export default function Chatbot() {
-  const [role, setRole] = useState<'student' | 'instructor'>('student');
-  const [messageValue, setMessageValue] = useState<string>('');
+  // fetch current user
+  const { currentUser } = useSelector((state: any) => state.accountReducer);
+  const [isStudent, setIsStudent] = useState<boolean>(true);
+
+  const [messageValue, setMessageValue] = useState<string>("");
   const [loading, setLoading] = useState<boolean>(false);
   const [chatHistory, setChatHistory] = useState<ChatMessage[]>([
     {
-      id: '1',
+      id: "1",
       content: "Hello! I'm your AI assistant. How can I help you today?",
-      sender: 'bot',
+      sender: "bot",
     },
   ]);
   const [messageApi, contextHolder] = message.useMessage();
+
+  // check user's role is Student or Instructor/Admin
+  useEffect(() => {
+    if (currentUser?.role) {
+      setIsStudent(currentUser.role === "student");
+    }
+  }, [currentUser]);
 
   // Mock send message
   React.useEffect(() => {
     if (loading) {
       const timer = setTimeout(() => {
         setLoading(false);
-        messageApi.success('Message sent successfully!');
-        
+        messageApi.success("Message sent successfully!");
+
         // Simulate bot reply (optional)
         setTimeout(() => {
           setChatHistory((prev) => [
@@ -75,7 +103,7 @@ export default function Chatbot() {
             {
               id: Date.now().toString(),
               content: "Thanks for your message! How can I assist further?",
-              sender: 'bot',
+              sender: "bot",
             },
           ]);
         }, 1000);
@@ -83,10 +111,6 @@ export default function Chatbot() {
       return () => clearTimeout(timer);
     }
   }, [loading]);
-
-  const handleRoleChange = (e: RadioChangeEvent) => {
-    setRole(e.target.value);
-  };
 
   const handleSendMessage = () => {
     if (messageValue.trim()) {
@@ -96,96 +120,90 @@ export default function Chatbot() {
         {
           id: Date.now().toString(),
           content: messageValue,
-          sender: 'user',
+          sender: "user",
         },
       ]);
-      
-      setMessageValue('');
+
+      setMessageValue("");
       setLoading(true);
-      messageApi.info('Sending message...');
+      messageApi.info("Sending message...");
     } else {
-      messageApi.warning('Please enter a message');
+      messageApi.warning("Please enter a message");
     }
   };
 
-    // Handle clicking a prompt
-    const handlePromptClick = (description: string) => {
-      // Add the clicked prompt as a user message
-      console.log("Selected prompt:", description);
-      setChatHistory((prev) => [
-        ...prev,
-        {
-          id: Date.now().toString(),
-          content: description,
-          sender: 'user',
-        },
-      ]);
-      setLoading(true); // Simulate sending
-      messageApi.info('Sending message...');
-    };
-  
+  // Handle clicking a prompt
+  const handlePromptClick = (description: string) => {
+    // Add the clicked prompt as a user message
+    console.log("Selected prompt:", description);
+    setChatHistory((prev) => [
+      ...prev,
+      {
+        id: Date.now().toString(),
+        content: description,
+        sender: "user",
+      },
+    ]);
+    setLoading(true); // Simulate sending
+    messageApi.info("Sending message...");
+  };
 
   return (
-    <div id="wd-chatbot-screen" style={{ padding: '24px', maxWidth: '800px', margin: '0 auto' }}>
+    <div
+      id="wd-chatbot-screen"
+      style={{ padding: "24px", maxWidth: "800px", margin: "0 auto" }}
+    >
       {contextHolder}
-      <Card 
-        title="AI Assistant" 
-        bordered={false} 
-        headStyle={{ borderBottom: 0, textAlign: 'center' }}
-        bodyStyle={{ padding: '16px 0' }}
+      <Card
+        title="AI Assistant"
+        bordered={false}
+        headStyle={{ borderBottom: 0, textAlign: "center" }}
+        bodyStyle={{ padding: "16px 0" }}
       >
-        <Flex vertical gap="large" style={{ height: '60vh', overflowY: 'auto', padding: '0 16px' }}>
+        <Flex
+          vertical
+          gap="large"
+          style={{ height: "60vh", overflowY: "auto", padding: "0 16px" }}
+        >
           {/* Render chat history */}
           {chatHistory.map((msg) => (
             <Bubble
               key={msg.id}
-              placement={msg.sender === 'user' ? 'end' : 'start'}
-              variant={msg.sender === 'user' ? 'filled' : 'outlined'}
+              placement={msg.sender === "user" ? "end" : "start"}
+              variant={msg.sender === "user" ? "filled" : "outlined"}
               avatar={{ icon: <UserOutlined /> }}
               content={<Text>{msg.content}</Text>}
             />
           ))}
-          
-          {/* Role selection bubble (only shown once) */}
-          {chatHistory.length <= 1 && (
-            <Bubble 
-              variant="outlined" 
-              avatar={{ icon: <UserOutlined /> }} 
-              content={
-                <Flex vertical gap="middle">
-                  <Text strong>Please select your role:</Text>
-                  <Radio.Group 
-                    onChange={handleRoleChange} 
-                    value={role}
-                    optionType="button"
-                    buttonStyle="solid"
-                  >
-                    <Radio.Button value="student">Student</Radio.Button>
-                    <Radio.Button value="instructor">Instructor</Radio.Button>
-                  </Radio.Group>
-                </Flex>
-              } 
-            />
-          )}
-          
-          {/* Prompts bubble (only shown once) */}
-          {chatHistory.length <= 1 && (
-            <Bubble
-              variant="borderless"
-              avatar={{ icon: <UserOutlined /> }}
-              content={
-                <Prompts 
-                  title={role === 'student' ? "Common Student Questions" : "Common Instructor Questions"} 
-                  items={role === 'student' ? studentItems : instructorItems} 
-                  vertical
-                  onItemClick={(item) => handlePromptClick(item.data.description as string)} // Add click handler
-                />
-              }
-            />
-          )}
         </Flex>
 
-        <div style={{ padding: '16px', borderTop: '1px solid #f0f0f0', marginTop: '16px' }}>
+        {/* Prompts bubble  */}
+        <Bubble
+          variant="borderless"
+          avatar={{ icon: <BarChartOutlined /> }}
+          content={
+            <Prompts
+              title={
+                isStudent
+                  ? "Common Student Questions"
+                  : "Common Instructor Questions"
+              }
+              items={isStudent ? studentItems : instructorItems}
+              onItemClick={(item) =>
+                handlePromptClick(item.data.description as string)
+              } // Add click handler
+              wrap
+            />
+          }
+        />
+
+        <div
+          style={{
+            padding: "16px",
+            borderTop: "1px solid #f0f0f0",
+            marginTop: "16px",
+          }}
+        >
           <Sender
             placeholder="Type your question here..."
             loading={loading}
@@ -194,10 +212,10 @@ export default function Chatbot() {
             onSubmit={handleSendMessage}
             onCancel={() => {
               setLoading(false);
-              messageApi.error('Message cancelled');
+              messageApi.error("Message cancelled");
             }}
             autoSize={{ minRows: 1, maxRows: 4 }}
-            style={{ borderRadius: '20px' }}
+            style={{ borderRadius: "20px" }}
           />
         </div>
       </Card>
