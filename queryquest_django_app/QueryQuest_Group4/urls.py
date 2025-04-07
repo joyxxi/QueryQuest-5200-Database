@@ -51,5 +51,6 @@ urlpatterns = [
     # Path to feedback app
     path('feedback/', include('feedback.urls')),
 
-    
+    # Path to chatbot app
+    path('chatbot/', include('chatbot.urls')),
 ]
