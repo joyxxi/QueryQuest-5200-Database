@@ -3,7 +3,9 @@ from rest_framework.response import Response
 from rest_framework import status
 from openai import OpenAI
 from django.conf import settings
-from users.models import Student  # 确保引入正确的模型路径
+from users.models import Student
+from submissions.models import Submission
+
 
 # 配置 OpenAI API 密钥
 client = OpenAI(api_key=settings.OPENAI_API_KEY)
@@ -110,6 +112,69 @@ class QueryStudentRankingWithPosition(APIView):
             return Response({
                 'student_id': student_id,  # 使用请求中的 student_id
                 'ranking_position': ranking_position,
+                'generated_sql': generated_sql  # 将生成的 SQL 查询作为附加字段返回
+            }, status=status.HTTP_200_OK)
+
+        except Exception as e:
+            # 捕获错误并返回错误信息
+            return Response({"error": str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+
+
+class QueryStudentWrongProblems(APIView):
+    def get(self, request, student_id):
+        '''
+        Retrieves the problem_id of all wrong problems for a specific student using ChatGPT.
+        '''
+        prompt = f"""
+Generate an SQL query to retrieve the distinct problem_id and the corresponding submission_id for all wrong problems (result = 'F') 
+for the student with student_id = {student_id} from the 'Submissions' table. 
+The database structure is:
+table 'Submissions' with fields 'submission_id' (primary key), 'student_id', 'problem_id', and 'result' (which can be 'F' or 'P').
+
+The query should have two levels: an inner query and an outer query. 
+1. The inner query should find the minimum 'submission_id' for each 'problem_id' where the 'student_id' is {student_id} and 'result' is 'F'.
+2. The outer query should use this inner query to retrieve the corresponding 'submission_id' and 'problem_id', ensuring that there are no duplicate 'problem_id' values.
+
+The query should return only the columns 'submission_id' and 'problem_id', ensuring there are no duplicate 'problem_id' entries.
+
+Please output only the SQL query, with no additional text or formatting, and ensure it includes both a subquery and an outer query.
+"""
+
+
+
+        try:
+            # 与 ChatGPT API 交互，获取 SQL 查询
+            response = client.chat.completions.create(
+                model="gpt-3.5-turbo",
+                messages=[
+                    {"role": "system", "content": "You are a helpful SQL assistant."},
+                    {"role": "user", "content": prompt},
+                ],
+                max_tokens=150,
+                temperature=0.5,
+            )
+
+            # 获取 ChatGPT 返回的 SQL 查询并清理
+            generated_sql = response.choices[0].message.content.strip()
+            generated_sql = generated_sql.replace('```sql', '').replace('```', '').strip()
+
+            # 输出生成的 SQL 查询以便调试
+            print("Generated SQL:", generated_sql)
+
+            # 执行生成的 SQL 查询（确保包括主键）
+            problems = Submission.objects.raw(generated_sql)  # 执行生成的 SQL 查询
+
+            # 如果查询结果为空，返回错误信息
+            if not problems:
+                return Response({"error": "No wrong problems found for this student."}, status=status.HTTP_404_NOT_FOUND)
+
+            # 获取所有错题的 problem_id
+            wrong_problem_ids = [problem.problem_id for problem in problems]
+
+            # 返回错题的 problem_ids
+            return Response({
+                'student_id': student_id,  # 使用请求中的 student_id
+                'wrong_problem_ids': wrong_problem_ids,
                 'generated_sql': generated_sql  # 将生成的 SQL 查询作为附加字段返回
             }, status=status.HTTP_200_OK)
 
