@@ -10,7 +10,7 @@ from submissions.models import Submission
 # 配置 OpenAI API 密钥
 client = OpenAI(api_key=settings.OPENAI_API_KEY)
 
-class QueryStudentRanking(APIView):
+class QueryStudentPoints(APIView):
     def get(self, request, student_id):
         '''
         Retrieves the total_points for a specific student using ChatGPT.

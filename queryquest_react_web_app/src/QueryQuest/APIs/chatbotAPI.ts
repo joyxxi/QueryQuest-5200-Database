@@ -4,7 +4,7 @@ export const REMOTE_SERVER = process.env.REACT_APP_REMOTE_SERVER;
 // Get total points for a student
 export const getStudentPoints = async (studentId: number) => {
   const response = await axios.get(
-    `${REMOTE_SERVER}/chatbot/query_ranking/${studentId}/`
+    `${REMOTE_SERVER}/chatbot/query_points/${studentId}/`
   );
   return response.data;
 };
