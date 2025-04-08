@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { useSelector } from "react-redux";
+import * as client from "../APIs/chatbotAPI";
 import {
   CoffeeOutlined,
   FireOutlined,
@@ -28,16 +29,38 @@ const studentItems = [
     key: "1",
     icon: <CoffeeOutlined style={{ color: "#964B00" }} />,
     description: "My current total points",
+    callback: async (userId: number) => {
+      const data = await client.getStudentPoints(userId);
+      const sql = data.generated_sql;
+      const res = `You gained ${data.total_points} points in all.`;
+      return { sql, res };
+    },
   },
   {
     key: "2",
     icon: <SmileOutlined style={{ color: "#FAAD14" }} />,
     description: "My current rank",
+    callback: async (userId: number) => {
+      const data = await client.getStudentRankingWithPosition(userId);
+      const sql = data.generated_sql;
+      const res = `You are ranked ${data.ranking_position} in all the students.`;
+      return { sql, res };
+    },
   },
   {
     key: "3",
     icon: <FireOutlined style={{ color: "#FF4D4F" }} />,
     description: "Questions I've answered incorrectly before",
+    callback: async (userId: number) => {
+      const data = await client.getStudentWrongProblems(userId);
+      const sql = data.generated_sql;
+      const res = data.wrong_problem_ids.length
+        ? `You previously answered these questions incorrectly: ${data.wrong_problem_ids
+            .map((p: any) => `#${p}`)
+            .join(", ")}.`
+        : "You haven't answered any questions incorrectly!";
+      return { sql, res };
+    },
   },
 ];
 
@@ -46,16 +69,34 @@ const instructorItems = [
     key: "4",
     icon: <TrophyOutlined style={{ color: "#FFD700" }} />,
     description: "Names of the top 5 highest scorers",
+    callback: async (userId: number) => {
+      // Temporary SQL and response for the callback
+      const sql = "SELECT "; // Placeholder SQL
+      const res = "You ."; // Placeholder response
+      return { sql, res };
+    },
   },
   {
     key: "5",
     icon: <TeamOutlined style={{ color: "#1890FF" }} />,
     description: "Current number of students",
+    callback: async (userId: number) => {
+      // Temporary SQL and response for the callback
+      const sql = "SELECT "; // Placeholder SQL
+      const res = "You ."; // Placeholder response
+      return { sql, res };
+    },
   },
   {
     key: "6",
     icon: <BookOutlined style={{ color: "#52C41A" }} />,
     description: "Current number of questions",
+    callback: async (userId: number) => {
+      // Temporary SQL and response for the callback
+      const sql = "SELECT "; // Placeholder SQL
+      const res = "You ."; // Placeholder response
+      return { sql, res };
+    },
   },
 ];
 
@@ -133,7 +174,7 @@ export default function Chatbot() {
   };
 
   // Handle clicking a prompt
-  const handlePromptClick = (description: string) => {
+  const handlePromptClick = async (description: string) => {
     // Add the clicked prompt as a user message
     console.log("Selected prompt:", description);
     setChatHistory((prev) => [
@@ -146,6 +187,44 @@ export default function Chatbot() {
     ]);
     setLoading(true); // Simulate sending
     messageApi.info("Sending message...");
+
+    // Simulate fetching the response from the callback function
+    const item = isStudent
+      ? studentItems.find((item) => item.description === description)
+      : instructorItems.find((item) => item.description === description);
+
+    if (item) {
+      const userId = currentUser?.user_id;
+      const { sql, res } = await item.callback(userId);
+
+      // Send SQL message from bot
+      setChatHistory((prev) => [
+        ...prev,
+        {
+          id: Date.now().toString(),
+          content: `AI generates SQL: ${sql}`,
+          sender: "bot",
+        },
+      ]);
+      setLoading(false);
+      messageApi.info("AI is generating SQL...");
+
+      // Wait for 3 seconds before showing the result message
+      setLoading(true);
+      setTimeout(() => {
+        // Send result message from bot after a 3-second delay
+        setChatHistory((prev) => [
+          ...prev,
+          {
+            id: Date.now().toString(),
+            content: res,
+            sender: "bot",
+          },
+        ]);
+        messageApi.success("Found answer successfully!");
+      }, 3000); // 3-second delay
+    }
+    setLoading(false);
   };
 
   return (
