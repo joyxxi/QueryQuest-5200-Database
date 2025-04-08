@@ -59,7 +59,8 @@ INSTALLED_APPS = [
     'users',
     'progress',
     'feedback',
-    'usermessages'
+    'usermessages',
+    'chatbot'
 ]
 
 MIDDLEWARE = [
