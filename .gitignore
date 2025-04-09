@@ -18,3 +18,10 @@ queryquest_django_app/problems/migrations/__pycache__
 /queryquest_django_app/progress/migrations/__pycache__
 /queryquest_django_app/usermessages/__pycache__
 /queryquest_django_app/usermessages/migrations/__pycache__
+queryquest_django_app/chatbot/__pycache__/__init__.cpython-313.pyc
+queryquest_django_app/chatbot/__pycache__/admin.cpython-313.pyc
+queryquest_django_app/chatbot/__pycache__/apps.cpython-313.pyc
+queryquest_django_app/chatbot/__pycache__/models.cpython-313.pyc
+queryquest_django_app/chatbot/__pycache__/urls.cpython-313.pyc
+queryquest_django_app/chatbot/__pycache__/views.cpython-313.pyc
+queryquest_django_app/chatbot/migrations/__pycache__/__init__.cpython-313.pyc

@@ -24,3 +24,27 @@ export const getStudentWrongProblems = async (studentId: number) => {
   );
   return response.data;
 };
+
+// Get list of top 5 students
+export const getTopFiveStudents = async () => {
+  const response = await axios.get(
+    `${REMOTE_SERVER}/chatbot/top_5_students/`
+  );
+  return response.data;
+};
+
+// Get number of students
+export const numberOfStudents = async () => {
+  const response = await axios.get(
+    `${REMOTE_SERVER}/chatbot/number_of_students/`
+  );
+  return response.data;
+};
+
+//Get number of problems
+export const numberOfProblems = async () => {
+  const response = await axios.get(
+    `${REMOTE_SERVER}/chatbot/number_of_problems/`
+  );
+  return response.data;
+};
