@@ -3,7 +3,11 @@ from rest_framework.response import Response
 from rest_framework import status
 from openai import OpenAI
 from django.conf import settings
-from users.models import Student  # 确保引入正确的模型路径
+from users.models import Student
+from rest_framework.decorators import api_view
+from django.db import connection
+import re
+import logging
 
 # 配置 OpenAI API 密钥
 client = OpenAI(api_key=settings.OPENAI_API_KEY)
@@ -117,3 +121,292 @@ class QueryStudentRankingWithPosition(APIView):
             # 捕获错误并返回错误信息
             return Response({"error": str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
+
+
+"""
+1. Names of the top 5 highest scores
+2. Current number of students
+3. Current number of questions
+"""
+
+#-----------------------API-----------------------#
+@api_view(['GET'])
+def top_5_students(request):
+    """
+    Retrieves the names of the top 5 students with the highest scores, including ties.
+    """
+    query = top_students_llm()
+    print("Generated SQL Query:", query)
+
+    if not is_safe_query(query, allowed_tables=['Students', 'Users'], allow_joins=True, allow_subqueries=True):
+        return Response({
+            "message": "Sorry, I couldn't retrieve the student rankings at this time.",
+            "query": query,
+        }, status=status.HTTP_400_BAD_REQUEST)
+
+
+    try:
+        with connection.cursor() as cursor:
+            cursor.execute(query)
+            columns = [col[0] for col in cursor.description]
+            results = cursor.fetchall()
+            
+        students_data = []
+        for row in results:
+            students_data.append(dict(zip(columns, row)))
+
+        if not students_data:
+            formatted_message = "I couldn't find any student records with scores."
+        else:
+            formatted_message = "Here are the top 5 students with the highest scores:\n\n"
+
+            for i, student in enumerate(students_data, 1):
+                formatted_message += f"{i}. {student['username']}: {student['total_points']} points\n"
+            
+            if len(students_data) > 5:
+                formatted_message += "\nMore than 5 students are shown because there are tied scores."
+        
+        return Response({
+            "message": formatted_message,
+            "query": query,
+            "data": students_data
+        }, status=status.HTTP_200_OK)
+    except Exception as e:
+        logging.error(f"Database error: {str(e)}")
+        
+        return Response({
+            "message": "I encountered an issue while retrieving the student rankings. Please try again later.",
+            "query": query,
+        }, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+
+@api_view(['GET'])
+def number_of_students(request):
+    """
+    Retrieves the current number of students.
+    """
+    query = number_of_students_llm()
+    if not is_safe_query(query, allowed_tables=['Students'], allow_joins=False, allow_subqueries=True):
+        return Response({
+            "message": "Sorry, I couldn't retrieve the number of students at this time.",
+            "query": query,
+        }, status=status.HTTP_400_BAD_REQUEST)
+    try:
+        with connection.cursor() as cursor:
+            cursor.execute(query)
+            result = cursor.fetchone()
+        
+        if result:
+            count = result[0]
+            return Response({
+                "message": f"There are currently {count} students enrolled.",
+                "query": query,
+                "data": {"number_of_students": count}
+            }, status=status.HTTP_200_OK)
+        else:
+            return Response({
+                "message": "I couldn't find the number of students.",
+                "query": query,
+            }, status=status.HTTP_404_NOT_FOUND)
+    except Exception as e:
+        logging.error(f"Database error: {str(e)}")
+        return Response({
+            "message": "I encountered an issue while retrieving the number of students. Please try again later.",
+            "query": query,
+        }, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+
+
+@api_view(['GET'])
+def number_of_problems(request):
+    """
+    Retrieves the current number of problems.
+    """
+    query = number_of_problems_llm()
+    if not is_safe_query(query, allowed_tables=['Problems'], allow_joins=False, allow_subqueries=True):
+        return Response({
+            "message": "Sorry, I couldn't retrieve the number of problems at this time.",
+            "query": query,
+        }, status=status.HTTP_400_BAD_REQUEST)
+    try:
+        with connection.cursor() as cursor:
+            cursor.execute(query)
+            result = cursor.fetchone()
+        
+        if result:
+            count = result[0]
+            return Response({
+                "message": f"There are currently {count} problems in the database.",
+                "query": query,
+                "data": {"number_of_problems": count}
+            }, status=status.HTTP_200_OK)
+        else:
+            return Response({
+                "message": "I couldn't find the number of problems.",
+                "query": query,
+            }, status=status.HTTP_404_NOT_FOUND)
+    except Exception as e:
+        logging.error(f"Database error: {str(e)}")
+        return Response({
+            "message": "I encountered an issue while retrieving the number of problems. Please try again later.",
+            "query": query,
+        }, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+
+#----------------------OpenAI API----------------------#
+def number_of_problems_llm():
+    """
+    Calls OpenAI API to generate SQL query for retrieving the number of problems.
+    """
+    prompt = """
+    Generate a SQL query to count the total number of problems.
+    The database structure is:
+    table 'Problems' with fields 'problem_id' (primary key) etc.;
+    Only return the SQL query without any explanation.
+    """
+    response = client.chat.completions.create(
+        model="gpt-4-turbo",
+        messages=[
+            {"role": "system", "content": "You are a helpful assistant that generates SQL queries."},
+            {"role": "user", "content": prompt}
+        ],
+        temperature=0.1
+    )
+    
+    sql_query = response.choices[0].message.content.strip()
+
+    match = re.search(r"```(?:sql)?(.*?)```", sql_query, re.DOTALL | re.IGNORECASE)
+    if match:
+        sql_query = match.group(1).strip()
+    else:
+        sql_query = sql_query.strip()
+    
+    return sql_query
+
+def number_of_students_llm():
+    """
+    Calls OpenAI API to generate SQL query for retrieving the number of students.
+    """
+    prompt = """
+    Generate a SQL query to count the total number of current students.
+    The database structure is:
+    table 'Students' with fields 'student_id' (primary key) and 'total_points'.
+    Only return the SQL query without any explanation.
+    """
+    response = client.chat.completions.create(
+        model="gpt-4-turbo",
+        messages=[
+            {"role": "system", "content": "You are a helpful assistant that generates SQL queries."},
+            {"role": "user", "content": prompt}
+        ],
+        temperature=0.1
+    )
+    
+    sql_query = response.choices[0].message.content.strip()
+
+    match = re.search(r"```(?:sql)?(.*?)```", sql_query, re.DOTALL | re.IGNORECASE)
+    if match:
+        sql_query = match.group(1).strip()
+    else:
+        sql_query = sql_query.strip()
+    
+    return sql_query
+
+
+def top_students_llm():
+    """
+    Calls OpenAI API to generate SQL query for retrieving top students.
+    """
+    prompt = """
+    Generate a SQL query to retrieve the top 5 students with the highest scores.
+    If there is a tie for any position, include all students with the same score.
+    The result should be ordered by score in descending order.
+    The database structure is:
+    table 'Students' with fields 'student_id' (primary key) and 'total_points';
+    table 'Users' with fields 'user_id' (primary key) and 'username'.
+    The query should join the 'Students' and 'Users' tables on 'student_id' and 'user_id'.
+    Only return the SQL query without any explanation.
+    """
+    
+    response = client.chat.completions.create(
+        model="gpt-4-turbo",
+        messages=[
+            {"role": "system", "content": "You are a helpful assistant that generates SQL queries."},
+            {"role": "user", "content": prompt}
+        ],
+        temperature=0.1
+    )
+    
+    sql_query = response.choices[0].message.content.strip()
+
+    match = re.search(r"```(?:sql)?(.*?)```", sql_query, re.DOTALL | re.IGNORECASE)
+    if match:
+        sql_query = match.group(1).strip()
+    else:
+        sql_query = sql_query.strip()
+    
+    return sql_query
+
+#-----------------------Helper-----------------------#
+def is_safe_query(query, allowed_tables=[], allow_joins=True, allow_subqueries=True):
+    """
+    Flexible SQL validation that can be configured for different APIs.
+    """
+    # Basic validation
+    query_lower = query.lower().strip()
+    
+    if not query_lower.startswith('select'):
+        return False
+    
+    # SQL comments
+    if '--' in query_lower or '/*' in query_lower:
+        return False
+    
+    # Dangerous operations
+    dangerous_operations = [
+        'insert', 'update', 'delete', 'drop', 'alter', 'truncate', 
+        'create', 'grant', 'revoke', 'commit', 'rollback'
+    ]
+    
+    for operation in dangerous_operations:
+        if re.search(r'\b' + operation + r'\b', query_lower):
+            return False
+
+    # Table validation
+    from_pattern = r'from\s+([a-zA-Z0-9_\.]+)(?:\s+(?:as\s+)?[a-zA-Z0-9_]+)?'
+    join_pattern = r'join\s+([a-zA-Z0-9_\.]+)(?:\s+(?:as\s+)?[a-zA-Z0-9_]+)?'
+    found_tables = set()
+    
+    for match in re.finditer(from_pattern, query_lower):
+        table = match.group(1)
+        if '.' in table:
+            table = table.split('.')[-1]
+        found_tables.add(table)
+    
+    for match in re.finditer(join_pattern, query_lower):
+        table = match.group(1)
+        # Remove schema prefixes
+        if '.' in table:
+            table = table.split('.')[-1]
+        found_tables.add(table)
+
+    for table in found_tables:
+        if table not in [t.lower() for t in allowed_tables]:
+            print(f"Table not allowed: {table}")
+            return False
+    
+    # Check for JOIN if not allowed
+    if not allow_joins and re.search(r'\bjoin\b', query_lower):
+        print("JOIN not allowed")
+        return False
+    
+    # Check for subqueries if not allowed
+    if not allow_subqueries and ('(' in query_lower and 'select' in query_lower):
+        print("Subqueries not allowed")
+        return False
+    
+    # Check for suspicious patterns
+    suspicious_patterns = ['exec', 'execute', 'sp_', 'xp_', '@@']
+    for pattern in suspicious_patterns:
+        if pattern in query_lower:
+            print(f"Suspicious pattern found: {pattern}")
+            return False
+    
+    return True

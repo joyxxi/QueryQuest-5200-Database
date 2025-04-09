@@ -43,7 +43,7 @@ def get_or_refresh_feedback(request, student_id, problem_id):
 
 def generate_llm_feedback(submission):
     '''
-    Calls OpenAI APT to generate feedback for the given submission.
+    Calls OpenAI API to generate feedback for the given submission.
     - If correct, explain why it is correct/
     - If incorrect, explain why it is wrong and guide the student.
     '''

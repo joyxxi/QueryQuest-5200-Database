@@ -1,5 +1,5 @@
-import React, { useEffect, useState } from "react";
-import { useSelector } from "react-redux";
+import React, { useEffect, useState } from 'react';
+import { useSelector } from 'react-redux';
 import {
   CoffeeOutlined,
   FireOutlined,
@@ -9,8 +9,8 @@ import {
   TrophyOutlined,
   BookOutlined,
   BarChartOutlined,
-} from "@ant-design/icons";
-import { Bubble, Prompts, PromptsProps, Sender } from "@ant-design/x";
+} from '@ant-design/icons';
+import { Bubble, Prompts, PromptsProps, Sender } from '@ant-design/x';
 import {
   App,
   Flex,
@@ -19,43 +19,43 @@ import {
   Typography,
   message,
   Card,
-} from "antd";
+} from 'antd';
 
 const { Title, Text } = Typography;
 
 const studentItems = [
   {
-    key: "1",
-    icon: <CoffeeOutlined style={{ color: "#964B00" }} />,
-    description: "My current total points",
+    key: '1',
+    icon: <CoffeeOutlined style={{ color: '#964B00' }} />,
+    description: 'My current total points',
   },
   {
-    key: "2",
-    icon: <SmileOutlined style={{ color: "#FAAD14" }} />,
-    description: "My current rank",
+    key: '2',
+    icon: <SmileOutlined style={{ color: '#FAAD14' }} />,
+    description: 'My current rank',
   },
   {
-    key: "3",
-    icon: <FireOutlined style={{ color: "#FF4D4F" }} />,
+    key: '3',
+    icon: <FireOutlined style={{ color: '#FF4D4F' }} />,
     description: "Questions I've answered incorrectly before",
   },
 ];
 
 const instructorItems = [
   {
-    key: "4",
-    icon: <TrophyOutlined style={{ color: "#FFD700" }} />,
-    description: "Names of the top 5 highest scorers",
+    key: '4',
+    icon: <TrophyOutlined style={{ color: '#FFD700' }} />,
+    description: 'Names of the top 5 highest scorers',
   },
   {
-    key: "5",
-    icon: <TeamOutlined style={{ color: "#1890FF" }} />,
-    description: "Current number of students",
+    key: '5',
+    icon: <TeamOutlined style={{ color: '#1890FF' }} />,
+    description: 'Current number of students',
   },
   {
-    key: "6",
-    icon: <BookOutlined style={{ color: "#52C41A" }} />,
-    description: "Current number of questions",
+    key: '6',
+    icon: <BookOutlined style={{ color: '#52C41A' }} />,
+    description: 'Current number of questions',
   },
 ];
 
@@ -63,7 +63,7 @@ const instructorItems = [
 type ChatMessage = {
   id: string;
   content: string;
-  sender: "user" | "bot";
+  sender: 'user' | 'bot';
 };
 
 export default function Chatbot() {
@@ -71,13 +71,13 @@ export default function Chatbot() {
   const { currentUser } = useSelector((state: any) => state.accountReducer);
   const [isStudent, setIsStudent] = useState<boolean>(true);
 
-  const [messageValue, setMessageValue] = useState<string>("");
+  const [messageValue, setMessageValue] = useState<string>('');
   const [loading, setLoading] = useState<boolean>(false);
   const [chatHistory, setChatHistory] = useState<ChatMessage[]>([
     {
-      id: "1",
+      id: '1',
       content: "Hello! I'm your AI assistant. How can I help you today?",
-      sender: "bot",
+      sender: 'bot',
     },
   ]);
   const [messageApi, contextHolder] = message.useMessage();
@@ -85,7 +85,7 @@ export default function Chatbot() {
   // check user's role is Student or Instructor/Admin
   useEffect(() => {
     if (currentUser?.role) {
-      setIsStudent(currentUser.role === "student");
+      setIsStudent(currentUser.role === 'student');
     }
   }, [currentUser]);
 
@@ -94,7 +94,7 @@ export default function Chatbot() {
     if (loading) {
       const timer = setTimeout(() => {
         setLoading(false);
-        messageApi.success("Message sent successfully!");
+        messageApi.success('Message sent successfully!');
 
         // Simulate bot reply (optional)
         setTimeout(() => {
@@ -102,8 +102,8 @@ export default function Chatbot() {
             ...prev,
             {
               id: Date.now().toString(),
-              content: "Thanks for your message! How can I assist further?",
-              sender: "bot",
+              content: 'Thanks for your message! How can I assist further?',
+              sender: 'bot',
             },
           ]);
         }, 1000);
@@ -120,57 +120,57 @@ export default function Chatbot() {
         {
           id: Date.now().toString(),
           content: messageValue,
-          sender: "user",
+          sender: 'user',
         },
       ]);
 
-      setMessageValue("");
+      setMessageValue('');
       setLoading(true);
-      messageApi.info("Sending message...");
+      messageApi.info('Sending message...');
     } else {
-      messageApi.warning("Please enter a message");
+      messageApi.warning('Please enter a message');
     }
   };
 
   // Handle clicking a prompt
   const handlePromptClick = (description: string) => {
     // Add the clicked prompt as a user message
-    console.log("Selected prompt:", description);
+    console.log('Selected prompt:', description);
     setChatHistory((prev) => [
       ...prev,
       {
         id: Date.now().toString(),
         content: description,
-        sender: "user",
+        sender: 'user',
       },
     ]);
     setLoading(true); // Simulate sending
-    messageApi.info("Sending message...");
+    messageApi.info('Sending message...');
   };
 
   return (
     <div
       id="wd-chatbot-screen"
-      style={{ padding: "24px", maxWidth: "800px", margin: "0 auto" }}
+      style={{ padding: '24px', maxWidth: '800px', margin: '0 auto' }}
     >
       {contextHolder}
       <Card
         title="AI Assistant"
         bordered={false}
-        headStyle={{ borderBottom: 0, textAlign: "center" }}
-        bodyStyle={{ padding: "16px 0" }}
+        headStyle={{ borderBottom: 0, textAlign: 'center' }}
+        bodyStyle={{ padding: '16px 0' }}
       >
         <Flex
           vertical
           gap="large"
-          style={{ height: "60vh", overflowY: "auto", padding: "0 16px" }}
+          style={{ height: '60vh', overflowY: 'auto', padding: '0 16px' }}
         >
           {/* Render chat history */}
           {chatHistory.map((msg) => (
             <Bubble
               key={msg.id}
-              placement={msg.sender === "user" ? "end" : "start"}
-              variant={msg.sender === "user" ? "filled" : "outlined"}
+              placement={msg.sender === 'user' ? 'end' : 'start'}
+              variant={msg.sender === 'user' ? 'filled' : 'outlined'}
               avatar={{ icon: <UserOutlined /> }}
               content={<Text>{msg.content}</Text>}
             />
@@ -185,8 +185,8 @@ export default function Chatbot() {
             <Prompts
               title={
                 isStudent
-                  ? "Common Student Questions"
-                  : "Common Instructor Questions"
+                  ? 'Common Student Questions'
+                  : 'Common Instructor Questions'
               }
               items={isStudent ? studentItems : instructorItems}
               onItemClick={(item) =>
@@ -199,9 +199,9 @@ export default function Chatbot() {
 
         <div
           style={{
-            padding: "16px",
-            borderTop: "1px solid #f0f0f0",
-            marginTop: "16px",
+            padding: '16px',
+            borderTop: '1px solid #f0f0f0',
+            marginTop: '16px',
           }}
         >
           <Sender
@@ -212,10 +212,10 @@ export default function Chatbot() {
             onSubmit={handleSendMessage}
             onCancel={() => {
               setLoading(false);
-              messageApi.error("Message cancelled");
+              messageApi.error('Message cancelled');
             }}
             autoSize={{ minRows: 1, maxRows: 4 }}
-            style={{ borderRadius: "20px" }}
+            style={{ borderRadius: '20px' }}
           />
         </div>
       </Card>

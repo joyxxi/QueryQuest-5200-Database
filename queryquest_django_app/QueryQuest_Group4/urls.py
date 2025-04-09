@@ -41,7 +41,6 @@ urlpatterns = [
     # Path to problems app
     path('problems/', include('problems.urls')),
 
-
     # Path to submissions app
     path('api/submissions/', include('submissions.urls')),
 
