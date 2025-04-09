@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { useSelector } from 'react-redux';
+import * as client from '../APIs/chatbotAPI';
 import {
   CoffeeOutlined,
   FireOutlined,
@@ -38,6 +39,16 @@ const studentItems = [
     key: '3',
     icon: <FireOutlined style={{ color: '#FF4D4F' }} />,
     description: "Questions I've answered incorrectly before",
+    callback: async (userId: number) => {
+      const data = await client.getStudentWrongProblems(userId);
+      const sql = data.generated_sql;
+      const res = data.wrong_problem_ids.length
+        ? `You previously answered these questions incorrectly: ${data.wrong_problem_ids
+            .map((p: any) => `#${p}`)
+            .join(', ')}.`
+        : "You haven't answered any questions incorrectly!";
+      return { sql, res };
+    },
   },
 ];
 
@@ -133,7 +144,7 @@ export default function Chatbot() {
   };
 
   // Handle clicking a prompt
-  const handlePromptClick = (description: string) => {
+  const handlePromptClick = async (description: string) => {
     // Add the clicked prompt as a user message
     console.log('Selected prompt:', description);
     setChatHistory((prev) => [

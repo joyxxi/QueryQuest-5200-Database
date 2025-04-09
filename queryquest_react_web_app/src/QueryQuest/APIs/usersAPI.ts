@@ -55,11 +55,6 @@ export const findUserById = async (user_id: number) => {
   return response.data;
 };
 
-// export const findAllUsers = async () => {
-//   const response = await axiosWithCredentials.get(USERS_API);
-//   return response.data;
-// };
-
 export const updateUserProfile = async (user: any) => {
   const response = await axiosWithCredentials.patch(
     `${REMOTE_SERVER}/api/users/profile/update/`,
@@ -74,13 +69,3 @@ export const deleteUser = async (userId: number) => {
   );
   return response.data;
 };
-
-// get all problems
-
-// get all progress for a user
-
-// create submission for a user for a problem
-
-// get total_points for a student
-
-// create a feeback for a student for a problem
