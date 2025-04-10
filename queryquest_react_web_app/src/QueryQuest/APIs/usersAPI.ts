@@ -8,14 +8,13 @@ const getCookie = (name: string) => {
   return undefined;
 };
 
-// Get the CSRF token
-const csrfToken = getCookie("csrftoken");
-
 export const signin = async (credentials: {
   username: string;
   password: string;
 }) => {
   try {
+    // Get the CSRF token
+    const csrfToken = getCookie("csrftoken");
     const response = await axiosWithCredentials.post(
       `${REMOTE_SERVER}/api/login/`,
       credentials,
@@ -43,6 +42,8 @@ export const signin = async (credentials: {
 };
 
 export const signup = async (user: any) => {
+  // Get the CSRF token
+  const csrfToken = getCookie("csrftoken");
   const response = await axiosWithCredentials.post(
     `${REMOTE_SERVER}/api/signup/`,
     user,
@@ -63,8 +64,14 @@ export const profile = async () => {
 };
 
 export const signout = async () => {
+  const csrfToken = getCookie("csrftoken");
   const response = await axiosWithCredentials.post(
-    `${REMOTE_SERVER}/api/logout/`
+    `${REMOTE_SERVER}/api/logout/`,
+    {
+      headers: {
+        "X-CSRFToken": csrfToken,
+      },
+    }
   );
   return response.data;
 };
@@ -75,16 +82,28 @@ export const findUserById = async (user_id: number) => {
 };
 
 export const updateUserProfile = async (user: any) => {
+  const csrfToken = getCookie("csrftoken");
   const response = await axiosWithCredentials.patch(
     `${REMOTE_SERVER}/api/users/profile/update/`,
-    user
+    user,
+    {
+      headers: {
+        "X-CSRFToken": csrfToken, // Include the CSRF token in the header
+      },
+    }
   );
   return response.data;
 };
 
 export const deleteUser = async (userId: number) => {
+  const csrfToken = getCookie("csrftoken");
   const response = await axios.delete(
-    `${REMOTE_SERVER}/api/users/${userId}/delete/`
+    `${REMOTE_SERVER}/api/users/${userId}/delete/`,
+    {
+      headers: {
+        "X-CSRFToken": csrfToken,
+      },
+    }
   );
   return response.data;
 };
