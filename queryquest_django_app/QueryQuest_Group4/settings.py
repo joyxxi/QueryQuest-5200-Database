@@ -122,14 +122,14 @@ if os.getenv('GAE_APPLICATION', None):
             'HOST': '/cloudsql/db-group4-451519:us-west1:neu-5200-group4', 
             'USER': 'yihan',
             'PASSWORD': 'yihan123!',
-            'NAME': 'queryquest',
+            'NAME': 'demo',
         }
     }
 else:
     DATABASES = {
         'default': {
             'ENGINE': 'django.db.backends.mysql',
-            'NAME': 'queryquest',
+            'NAME': 'demo',
             'USER': 'yihan',
             'PASSWORD': 'yihan123!',
             'HOST': '35.247.120.164',
