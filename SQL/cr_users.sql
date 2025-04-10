@@ -33,17 +33,17 @@ CREATE TABLE Admins (
 );
 
 -- Inserting Users
-INSERT INTO Users (user_id, role, username, email, password, created_at) VALUES
-(1, 'student', 'testuser', 'test@example.com', 'test123', '2025-03-25 21:09:26'),
-(2, 'student', 'testuser2', 'test2@example.com', 'test123', '2025-03-25 21:47:36'),
-(3, 'student', 'testuser3', 'test3@example.com', 'test123', '2025-03-25 21:47:45'),
-(4, 'student', 'testuser4', 'test4@example.com', 'test123', '2025-03-25 21:47:52'),
-(5, 'student', 'testuser5', 'test5@example.com', 'test123', '2025-03-25 21:48:03'),
-(6, 'instructor', 'instructor1', 'instructor1@example.com', 'test123', '2025-03-25 21:49:41'),
-(7, 'instructor', 'instructor2', 'instructor2@example.com', 'test123', '2025-03-25 21:49:53'),
-(8, 'instructor', 'instructor3', 'instructor3@example.com', 'test123', '2025-03-25 21:50:00'),
-(9, 'admin', 'admin1', 'admin1@example.com', 'test123', '2025-03-25 21:51:17'),
-(10, 'admin', 'admin2', 'admin2@example.com', 'test123', '2025-03-25 21:51:27');
+INSERT INTO Users (role, username, email, password, created_at) VALUES
+('student', 'testuser1', 'test1@example.com', 'test123', '2025-03-25 21:09:26'),
+('student', 'testuser2', 'test2@example.com', 'test123', '2025-03-25 21:47:36'),
+('student', 'testuser3', 'test3@example.com', 'test123', '2025-03-25 21:47:45'),
+('student', 'testuser4', 'test4@example.com', 'test123', '2025-03-25 21:47:52'),
+('student', 'testuser5', 'test5@example.com', 'test123', '2025-03-25 21:48:03'),
+('instructor', 'instructor1', 'instructor1@example.com', 'test123', '2025-03-25 21:49:41'),
+('instructor', 'instructor2', 'instructor2@example.com', 'test123', '2025-03-25 21:49:53'),
+('instructor', 'instructor3', 'instructor3@example.com', 'test123', '2025-03-25 21:50:00'),
+('admin', 'admin1', 'admin1@example.com', 'test123', '2025-03-25 21:51:17'),
+('admin', 'admin2', 'admin2@example.com', 'test123', '2025-03-25 21:51:27');
 
 -- Inserting Students
 INSERT INTO Students (student_id, current_level, total_points) VALUES

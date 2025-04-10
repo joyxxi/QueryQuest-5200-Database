@@ -1,4 +1,3 @@
-DROP TABLE IF EXISTS Messages;
 -- Create Messages Table
 DROP TABLE IF EXISTS Messages;
 CREATE TABLE Messages (
