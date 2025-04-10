@@ -202,12 +202,12 @@ export default function Chatbot() {
         ...prev,
         {
           id: Date.now().toString(),
-          content: `AI generates SQL: ${sql}`,
-          sender: "bot",
+          content: `AI generates SQL: \n${sql}`,
+          sender: 'bot',
         },
       ]);
       setLoading(false);
-      messageApi.info("AI is generating SQL...");
+      messageApi.info('AI is generating SQL...');
 
       // Wait for 3 seconds before showing the result message
       setLoading(true);
@@ -218,10 +218,10 @@ export default function Chatbot() {
           {
             id: Date.now().toString(),
             content: res,
-            sender: "bot",
+            sender: 'bot',
           },
         ]);
-        messageApi.success("Found answer successfully!");
+        messageApi.success('Found answer successfully!');
       }, 3000); // 3-second delay
     }
     setLoading(false);
@@ -251,7 +251,9 @@ export default function Chatbot() {
               placement={msg.sender === 'user' ? 'end' : 'start'}
               variant={msg.sender === 'user' ? 'filled' : 'outlined'}
               avatar={{ icon: <UserOutlined /> }}
-              content={<Text>{msg.content}</Text>}
+              content={
+                <Text style={{ whiteSpace: 'pre-line' }}>{msg.content}</Text>
+              }
             />
           ))}
         </Flex>
