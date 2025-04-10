@@ -9,16 +9,16 @@ export default function Profile() {
   const dispatch = useDispatch();
   const navigate = useNavigate();
   const { currentUser } = useSelector((state: any) => state.accountReducer);
-  const updateProfile = async () => {
-    const updatedProfile = await client.updateUserProfile(profile);
-    dispatch(setCurrentUser(updatedProfile));
-    setEditMode(false); // Exit edit mode after updating
-  };
 
   const [editMode, setEditMode] = useState(false);
   const fetchProfile = () => {
     if (!currentUser) return navigate("QueryQuest/Signin");
     setProfile(currentUser);
+  };
+  const updateProfile = async () => {
+    const updatedProfile = await client.updateUserProfile(profile);
+    dispatch(setCurrentUser(updatedProfile));
+    setEditMode(false); // Exit edit mode after updating
   };
   const signout = () => {
     dispatch(setCurrentUser(null));

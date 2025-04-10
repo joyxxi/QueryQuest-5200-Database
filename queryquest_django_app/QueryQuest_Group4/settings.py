@@ -79,15 +79,12 @@ MIDDLEWARE = [
 
 ROOT_URLCONF = 'QueryQuest_Group4.urls'
 
-SESSION_COOKIE_DOMAIN = ".appspot.com"  # This applies to all subdomains of appspot.com
-CSRF_COOKIE_DOMAIN = ".appspot.com"     # Same as above, needed for CSRF protection
-
 # Use secure cookies in production
 SESSION_COOKIE_SECURE = True
 CSRF_COOKIE_SECURE = True
-# CSRF Handling
-CSRF_COOKIE_HTTPONLY = True  # Prevent JavaScript access to the CSRF cookie
-CSRF_COOKIE_SAMESITE = 'Lax'  # Or 'Strict' depending on your requirements
+# Allow cookies in cross-origin requests (React on Netlify)
+SESSION_COOKIE_SAMESITE = 'None'
+CSRF_COOKIE_SAMESITE = 'None'
 
 # session management
 SESSION_ENGINE = "django.contrib.sessions.backends.db"  # Store sessions in DB
