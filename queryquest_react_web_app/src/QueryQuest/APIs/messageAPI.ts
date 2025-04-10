@@ -1,3 +1,7 @@
+import axios from "axios";
+
+export const REMOTE_SERVER = process.env.REACT_APP_REMOTE_SERVER;
+
 interface Message {
   message_id: number;
   m_content: string;
@@ -24,13 +28,10 @@ interface UsersResponse {
 // Fetch all messages
 export const fetchMessages = async (username: string): Promise<ApiResponse> => {
   try {
-    const response = await fetch(
-      `http://127.0.0.1:8000/api/allmessages/${username}/`
+    const response = await axios.get<ApiResponse>(
+      `${REMOTE_SERVER}/api/allmessages/${username}/`
     );
-    if (!response.ok) {
-      throw new Error("Network response was not ok");
-    }
-    return await response.json();
+    return response.data;
   } catch (error) {
     console.error("Error fetching messages:", error);
     return { status: "error", messages: [] };
@@ -40,10 +41,9 @@ export const fetchMessages = async (username: string): Promise<ApiResponse> => {
 // Fetch all users
 export const fetchUsers = async (): Promise<User[]> => {
   try {
-    const response = await fetch("http://127.0.0.1:8000/api/allusers/");
-    const data: UsersResponse = await response.json();
-    if (data.status === "success") {
-      return data.users.map((username) => ({ username }));
+    const response = await axios.get<UsersResponse>(`${REMOTE_SERVER}/api/allusers/`);
+    if (response.data.status === "success") {
+      return response.data.users.map((username) => ({ username }));
     }
     return [];
   } catch (error) {
@@ -57,16 +57,10 @@ export const markMessageAsRead = async (
   messageId: number
 ): Promise<boolean> => {
   try {
-    const response = await fetch(
-      `http://127.0.0.1:8000/api/mark_as_read/${messageId}/`,
-      {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-      }
+    const response = await axios.post(
+      `${REMOTE_SERVER}/api/mark_as_read/${messageId}/`
     );
-    return response.ok;
+    return response.status === 200;
   } catch (error) {
     console.error("Error marking message as read:", error);
     return false;
@@ -80,18 +74,17 @@ export const sendMessage = async (
   sender: string
 ): Promise<boolean> => {
   try {
-    const response = await fetch("http://127.0.0.1:8000/api/send_message/", {
-      method: "POST",
+    const response = await axios.post(`${REMOTE_SERVER}/api/send_message/`, {
+      receiver_username: receiver,
+      m_content: content,
+      sender_username: sender,
+    },
+    {
       headers: {
-        "Content-Type": "application/json",
+        'Content-Type': 'application/json',
       },
-      body: JSON.stringify({
-        receiver_username: receiver,
-        m_content: content,
-        sender_username: sender,
-      }),
     });
-    return response.ok;
+    return response.status >= 200 && response.status < 300;
   } catch (error) {
     console.error("Error sending message:", error);
     return false;
