@@ -25,3 +25,5 @@ queryquest_django_app/chatbot/__pycache__/models.cpython-313.pyc
 queryquest_django_app/chatbot/__pycache__/urls.cpython-313.pyc
 queryquest_django_app/chatbot/__pycache__/views.cpython-313.pyc
 queryquest_django_app/chatbot/migrations/__pycache__/__init__.cpython-313.pyc
+queryquest_django_app/app.yaml
+**/app.yaml
