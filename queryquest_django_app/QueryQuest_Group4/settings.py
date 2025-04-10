@@ -79,12 +79,23 @@ MIDDLEWARE = [
 
 ROOT_URLCONF = 'QueryQuest_Group4.urls'
 
+SESSION_COOKIE_DOMAIN = ".appspot.com"  # This applies to all subdomains of appspot.com
+CSRF_COOKIE_DOMAIN = ".appspot.com"     # Same as above, needed for CSRF protection
+
+# Use secure cookies in production
+SESSION_COOKIE_SECURE = True
+CSRF_COOKIE_SECURE = True
+# CSRF Handling
+CSRF_COOKIE_HTTPONLY = True  # Prevent JavaScript access to the CSRF cookie
+CSRF_COOKIE_SAMESITE = 'Lax'  # Or 'Strict' depending on your requirements
+
 # session management
 SESSION_ENGINE = "django.contrib.sessions.backends.db"  # Store sessions in DB
 SESSION_COOKIE_AGE = 86400  # Session expires in 1 day
 SESSION_COOKIE_HTTPONLY = True  # Prevent JavaScript access (Security)
 SESSION_SAVE_EVERY_REQUEST = True  # Refresh session expiry on every request
 SESSION_EXPIRE_AT_BROWSER_CLOSE = True  # Destroy session when browser is closed
+
 
 
 TEMPLATES = [

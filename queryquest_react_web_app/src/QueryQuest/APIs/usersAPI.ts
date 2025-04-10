@@ -57,8 +57,14 @@ export const signup = async (user: any) => {
 };
 
 export const profile = async () => {
+  const csrfToken = getCookie("csrftoken");
   const response = await axiosWithCredentials.get(
-    `${REMOTE_SERVER}/api/users/profile/`
+    `${REMOTE_SERVER}/api/users/profile/`,
+    {
+      headers: {
+        "X-CSRFToken": csrfToken, // Include the CSRF token in the headers
+      },
+    }
   );
   return response.data;
 };

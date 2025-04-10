@@ -166,7 +166,7 @@ def getUserById(request, user_id):
 def profile(request):
     """Retrieve user details from session"""
     user_id = request.session.get('user_id')
-
+    print(f"Session User ID: {user_id}")  # Debugging line
     if not user_id:
         return Response({"status": "error", "message": "User not logged in"}, status=status.HTTP_401_UNAUTHORIZED)
 
