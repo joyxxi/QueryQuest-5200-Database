@@ -1,6 +1,6 @@
 import { Update } from '@reduxjs/toolkit';
 import axios from 'axios';
-const BASE_URL = 'http://127.0.0.1:8000';
+const BASE_URL = process.env.REACT_APP_REMOTE_SERVER;
 
 export interface StudentProblem {
   problem_id: number;

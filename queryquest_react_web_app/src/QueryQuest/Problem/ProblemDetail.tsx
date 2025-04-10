@@ -16,6 +16,8 @@ interface Problem {
   correct_answer: number;
 }
 
+const BASE_URL = process.env.REACT_APP_REMOTE_SERVER;
+
 const ProblemDetail: React.FC = () => {
   const { pid } = useParams<{ pid: string }>();
   const numericPid = pid ? parseInt(pid, 10) : NaN;
@@ -37,7 +39,7 @@ const ProblemDetail: React.FC = () => {
 
     const fetchProblem = async () => {
       try {
-        const response = await fetch(`http://127.0.0.1:8000/problems/${numericPid}/`);
+        const response = await fetch(`${BASE_URL}/problems/${numericPid}/`);
         if (!response.ok) {
           throw new Error('Failed to fetch problem data');
         }
@@ -76,7 +78,7 @@ const ProblemDetail: React.FC = () => {
 
     try {
       // 发送请求到后端创建 submission
-      const response = await fetch('http://127.0.0.1:8000/api/submissions/', {
+      const response = await fetch(`${BASE_URL}/api/submissions/`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -201,7 +203,9 @@ const ProblemDetail: React.FC = () => {
 
       {resultMessage && (
         <p
-          className={`result-message ${resultMessage === 'Correct!' ? 'correct' : 'error'}`}
+          className={`result-message ${
+            resultMessage === 'Correct!' ? 'correct' : 'error'
+          }`}
         >
           {resultMessage}
         </p>
