@@ -1,6 +1,15 @@
 import axios from "axios";
 export const REMOTE_SERVER = process.env.REACT_APP_REMOTE_SERVER;
 const axiosWithCredentials = axios.create({ withCredentials: true });
+const getCookie = (name: string) => {
+  const value = `; ${document.cookie}`;
+  const parts = value.split(`; ${name}=`);
+  if (parts.length === 2) return parts.pop()?.split(";").shift();
+  return undefined;
+};
+
+// Get the CSRF token
+const csrfToken = getCookie("csrftoken");
 
 export const signin = async (credentials: {
   username: string;
@@ -9,7 +18,12 @@ export const signin = async (credentials: {
   try {
     const response = await axiosWithCredentials.post(
       `${REMOTE_SERVER}/api/login/`,
-      credentials
+      credentials,
+      {
+        headers: {
+          "X-CSRFToken": csrfToken, // Include the CSRF token in the header
+        },
+      }
     );
     return response.data; // Successful login
   } catch (error: any) {
@@ -31,7 +45,12 @@ export const signin = async (credentials: {
 export const signup = async (user: any) => {
   const response = await axiosWithCredentials.post(
     `${REMOTE_SERVER}/api/signup/`,
-    user
+    user,
+    {
+      headers: {
+        "X-CSRFToken": csrfToken, // Include the CSRF token in the headers
+      },
+    }
   );
   return response.data;
 };
